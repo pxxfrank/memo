@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>flomo 笔记 · 本地版</title>
+    <meta name="theme-color" content="#43B581" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
+      }
+      // 401（局域网访问需要令牌）时提示输入并保存
+      window.addEventListener('memo:unauthorized', () => {
+        const t = window.prompt('请输入访问令牌（桌面端 设置 → 局域网访问 中查看）：')
+        if (t && t.trim()) {
+          localStorage.setItem('memo-token', t.trim())
+          window.location.reload()
+        }
+      })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: "Microsoft YaHei", system-ui, sans-serif;
+    background: #1c1c1e;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+  }
+  textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    color: #f2f2f2;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 16px 18px 8px;
+    font-family: inherit;
+  }
+  textarea::placeholder { color: #6a6a6e; }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px 10px;
+    color: #8a8a8e;
+    font-size: 11px;
+  }
+  .bar .spacer { flex: 1; }
+  .bar button {
+    border: none;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  #saveBtn { background: #43b581; color: #fff; font-weight: 600; }
+  #saveBtn:hover { background: #34996b; }
+  #cancelBtn { background: transparent; color: #8a8a8e; }
+  #cancelBtn:hover { color: #f2f2f2; }
+  .accent { border-top: 2px solid #43b581; }
+</style>
+</head>
+<body>
+  <div class="accent"></div>
+  <textarea id="input" placeholder="记下此刻的想法，支持 #标签 …" autofocus></textarea>
+  <div class="bar">
+    <span>Enter 保存 · Esc 取消</span>
+    <span class="spacer"></span>
+    <button id="cancelBtn">取消</button>
+    <button id="saveBtn">保存</button>
+  </div>
+  <script>
+    const input = document.getElementById('input')
+    input.focus()
+    input.select()
+
+    async function save() {
+      const text = input.value.trim()
+      if (!text) return
+      await window.memoAPI.save(text)
+      window.memoAPI.close()
+    }
+    function cancel() {
+      window.memoAPI.close()
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', save)
+    document.getElementById('cancelBtn').addEventListener('click', cancel)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        save()
+      }
+      if (e.key === 'Escape') cancel()
+    })
+  </script>
+</body>
+</html>

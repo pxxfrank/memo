@@ -1,0 +1,48 @@
+# ---- 数据与凭据（绝不外泄） ----
+memo.db
+config.json
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+sync-state.json
+
+# ---- 前端构建 ----
+node_modules/
+flomo/node_modules/
+flomo/dist/
+app/
+
+# ---- 桌面端 ----
+desktop/node_modules/
+desktop/release/
+desktop/dist/
+
+# ---- Python ----
+__pycache__/
+*.pyc
+build/
+dist/
+.venv/
+
+# ---- Flutter / 手机端 ----
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins*
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/windows/flutter/ephemeral/
+mobile/ios/Pods/
+mobile/.idea/
+
+# ---- 测试产物 ----
+sync_interop/
+sync_interop2/
+*.log
+
+# ---- IDE / 系统 ----
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
