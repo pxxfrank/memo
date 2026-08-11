@@ -1,18 +1,25 @@
 /// 富文本（Markdown 子集）解析与格式操作（与桌面端 flomo/src/lib/rich.ts 同规则）
 /// 加粗 **x**、下划线 <u>x</u>、#标签、行首缩进（4 空格=1 级）、
 /// 无序列表 "- "、有序列表 "1. "；存储为纯文本，渲染端解析显示。
+/// span 为组合式（bold/underline 可同时为 true，支持 **<u>x</u>** 嵌套）。
 library;
 
 import 'package:flutter/material.dart';
 
 import '../ui/theme.dart';
 
-enum SpanType { bold, underline, tag, text }
+enum SpanType { text, tag }
 
 class RichSpan {
   final SpanType type;
   final String text;
-  const RichSpan(this.type, this.text);
+  final bool bold;
+  final bool underline;
+  final String? tag;
+  const RichSpan(this.type, this.text, {this.bold = false, this.underline = false, this.tag});
+  const RichSpan.text(String text, {bool bold = false, bool underline = false})
+      : this(SpanType.text, text, bold: bold, underline: underline);
+  const RichSpan.tag(String text) : this(SpanType.tag, text);
 }
 
 class RichLine {
@@ -22,8 +29,6 @@ class RichLine {
   const RichLine(this.indent, this.list, this.spans);
 }
 
-final _inlineRe = RegExp(
-    r'(\*\*[^*]+\*\*|<u>[^<]+</u>|#[^\s#，。！？!?,;；:："“”‘’（）()【】\[\]<>《》]+)');
 final _ulRe = RegExp(r'^[-*] (.*)$');
 final _olRe = RegExp(r'^\d+[.)] (.*)$');
 
@@ -47,22 +52,30 @@ List<RichLine> parseRich(String content) {
   }).toList();
 }
 
-List<RichSpan> parseInline(String text) {
+final _inlineRe = RegExp(
+    r'(\*\*[^*]+\*\*|<u>[\s\S]*?</u>|#[^\s#，。！？!?,;；:："“”‘’（）()【】\[\]<>《》]+)');
+
+/// 递归解析行内标记：**x**、<u>x</u> 可嵌套，生成组合式 span
+List<RichSpan> parseInline(String text, {bool bold = false, bool underline = false}) {
   final spans = <RichSpan>[];
   var last = 0;
   for (final m in _inlineRe.allMatches(text)) {
-    if (m.start > last) spans.add(RichSpan(SpanType.text, text.substring(last, m.start)));
+    if (m.start > last) {
+      spans.add(RichSpan.text(text.substring(last, m.start), bold: bold, underline: underline));
+    }
     final token = m.group(0)!;
     if (token.startsWith('**')) {
-      spans.add(RichSpan(SpanType.bold, token.substring(2, token.length - 2)));
+      spans.addAll(parseInline(token.substring(2, token.length - 2), bold: true, underline: underline));
     } else if (token.startsWith('<u>')) {
-      spans.add(RichSpan(SpanType.underline, token.substring(3, token.length - 4)));
+      spans.addAll(parseInline(token.substring(3, token.length - 4), bold: bold, underline: true));
     } else if (token.startsWith('#')) {
-      spans.add(RichSpan(SpanType.tag, token));
+      spans.add(RichSpan.tag(token));
     }
     last = m.end;
   }
-  if (last < text.length) spans.add(RichSpan(SpanType.text, text.substring(last)));
+  if (last < text.length) {
+    spans.add(RichSpan.text(text.substring(last), bold: bold, underline: underline));
+  }
   return spans;
 }
 
@@ -87,25 +100,24 @@ TextSpan richToSpan(String content, {TextStyle? baseStyle}) {
       ol = 0;
     }
     for (final s in l.spans) {
-      switch (s.type) {
-        case SpanType.bold:
-          children.add(TextSpan(
-              text: s.text,
-              style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink)));
-        case SpanType.underline:
-          children.add(TextSpan(
-              text: s.text,
-              style: const TextStyle(
-                  decoration: TextDecoration.underline,
-                  decorationColor: Color(0x8034996B),
-                  decorationThickness: 1.2)));
-        case SpanType.tag:
-          children.add(TextSpan(
-              text: s.text,
-              style: TextStyle(
-                  color: AppColors.greendark, fontWeight: FontWeight.w600)));
-        case SpanType.text:
-          children.add(TextSpan(text: s.text));
+      if (s.type == SpanType.tag) {
+        children.add(TextSpan(
+            text: s.text,
+            style: TextStyle(
+                color: AppColors.greendark, fontWeight: FontWeight.w600)));
+      } else {
+        TextStyle? style;
+        if (s.bold) {
+          style = TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink);
+        }
+        if (s.underline) {
+          final base2 = style ?? TextStyle(color: AppColors.ink);
+          style = base2.copyWith(
+              decoration: TextDecoration.underline,
+              decorationColor: const Color(0x8034996B),
+              decorationThickness: 1.2);
+        }
+        children.add(TextSpan(text: s.text, style: style));
       }
     }
     if (i < lines.length - 1) {
@@ -117,7 +129,7 @@ TextSpan richToSpan(String content, {TextStyle? baseStyle}) {
 
 enum FormatKind { bold, underline, ul, ol, indent, outdent }
 
-/// 对 TextEditingController 选区应用格式
+/// 对 TextEditingController 选区应用格式（纯文本模式用）
 void applyFormat(TextEditingController c, FormatKind kind) {
   final value = c.text;
   final s = c.selection.isValid ? c.selection.start : value.length;

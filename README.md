@@ -197,3 +197,4 @@ C:\Python314\python.exe -c "import sqlite3,os; s=sqlite3.connect(r'椤圭洰鐩�
 
 **鎹㈢數鑴?/ 澶囦唤**锛氭闈㈢増璁剧疆 鈫?瀵煎嚭 JSON 鈫?鏂版満鍣ㄥ鍏ワ紱鎴栫洿鎺ュ浠?`%APPDATA%\memo\data\memo.db`銆?
 
+

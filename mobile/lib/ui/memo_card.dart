@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 import '../db/database.dart';
 import '../models/memo.dart';
+import '../services/rich_delta.dart';
 import '../services/rich_text.dart';
 import 'format_toolbar.dart';
 import 'theme.dart';
@@ -14,7 +16,10 @@ class MemoCard extends StatelessWidget {
   const MemoCard({super.key, required this.memo, required this.onChanged});
 
   Future<void> _edit(BuildContext context) async {
-    final ctrl = TextEditingController(text: memo.content);
+    final ctrl = QuillController(
+      document: Document.fromDelta(mdToDelta(memo.content)),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
     final text = await showDialog<String>(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -24,27 +29,42 @@ class MemoCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                controller: ctrl,
-                autofocus: true,
-                maxLines: 6,
-                minLines: 2,
-                decoration: const InputDecoration(
-                  hintText: '修改内容……',
-                  border: OutlineInputBorder(),
+              Container(
+                constraints: const BoxConstraints(minHeight: 100, maxHeight: 220),
+                decoration: BoxDecoration(
+                  color: AppColors.bg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.line),
+                ),
+                padding: const EdgeInsets.all(8),
+                child: QuillEditor.basic(
+                  controller: ctrl,
+                  config: const QuillEditorConfig(
+                    autoFocus: true,
+                    expands: false,
+                    scrollable: false,
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              FormatToolbar(onFormat: (kind) {
-                applyFormat(ctrl, kind);
-                setDialogState(() {});
-              }),
+              QuillFormatToolbar(controller: ctrl),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+            TextButton(
+              onPressed: () {
+                ctrl.dispose();
+                Navigator.pop(ctx);
+              },
+              child: const Text('取消'),
+            ),
             FilledButton(
-              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              onPressed: () {
+                final md = deltaToMd(ctrl.document.toDelta()).trim();
+                ctrl.dispose();
+                Navigator.pop(ctx, md);
+              },
               child: const Text('保存'),
             ),
           ],

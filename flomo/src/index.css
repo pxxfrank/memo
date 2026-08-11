@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  /* 富文本编辑器（WYSIWYG）：空内容时显示占位 */
+  .rich-editor:empty::before {
+    content: attr(data-placeholder);
+    color: rgb(var(--flomo-faint));
+    pointer-events: none;
+  }
+  .rich-editor ul,
+  .rich-editor ol {
+    padding-left: 1.4em;
+    margin: 0.25em 0;
+  }
+  .rich-editor u {
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--flomo-greendark) / 0.5);
+    text-underline-offset: 2px;
+  }
   :root {
     --flomo-bg: 247 246 243;
     --flomo-sidebar: 241 240 235;

@@ -7,8 +7,19 @@ void main() {
   test('parseRich：加粗/下划线/标签', () {
     final lines = parseRich('普通 **加粗** <u>下划线</u> #标签');
     expect(lines.length, 1);
-    final types = lines.first.spans.map((s) => s.type).toList();
-    expect(types, containsAll([SpanType.bold, SpanType.underline, SpanType.tag]));
+    final spans = lines.first.spans;
+    expect(spans.any((s) => s.bold), isTrue);
+    expect(spans.any((s) => s.underline), isTrue);
+    expect(spans.any((s) => s.type == SpanType.tag), isTrue);
+  });
+
+  test('parseRich：嵌套加粗+下划线', () {
+    final lines = parseRich('**<u>重点</u>**');
+    final spans = lines.first.spans;
+    expect(spans.length, 1);
+    expect(spans.first.bold, isTrue);
+    expect(spans.first.underline, isTrue);
+    expect(spans.first.text, '重点');
   });
 
   test('parseRich：无序/有序列表与缩进', () {

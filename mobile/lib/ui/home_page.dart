@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 import '../db/database.dart';
 import '../models/memo.dart';
-import '../services/rich_text.dart';
+import '../services/rich_delta.dart';
 import 'format_toolbar.dart';
 import 'memo_card.dart';
 import 'theme.dart';
@@ -16,7 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _composer = TextEditingController();
+  final _composer = QuillController.basic();
   final _focus = FocusNode();
   List<Memo> _memos = [];
   List<Map<String, Object?>> _tags = [];
@@ -53,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _submit() async {
-    final text = _composer.text.trim();
+    final text = deltaToMd(_composer.document.toDelta()).trim();
     if (text.isEmpty) return;
     await MemoDb.create(text);
     _composer.clear();
@@ -107,19 +108,15 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
-            child: TextField(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+            child: QuillEditor.basic(
               controller: _composer,
-              focusNode: _focus,
-              maxLines: 3,
-              minLines: 1,
-              style: TextStyle(color: AppColors.ink, fontSize: 15, height: 1.5),
-              decoration: const InputDecoration(
-                hintText: '现在的想法是……',
-                filled: false,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
+              config: const QuillEditorConfig(
+                placeholder: '现在的想法是……',
+                expands: false,
+                padding: EdgeInsets.zero,
+                scrollable: false,
+                autoFocus: false,
               ),
             ),
           ),
@@ -127,10 +124,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             child: Row(
               children: [
-                FormatToolbar(onFormat: (kind) {
-                  applyFormat(_composer, kind);
-                  setState(() {});
-                }),
+                QuillFormatToolbar(controller: _composer),
                 const Spacer(),
                 Text(
                   'Ctrl+Enter 发送',
@@ -138,7 +132,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(width: 8),
                 FilledButton(
-                  onPressed: _composer.text.trim().isEmpty ? null : _submit,
+                  onPressed:
+                      _composer.document.isEmpty() ? null : _submit,
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
