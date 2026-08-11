@@ -30,6 +30,21 @@ export function SettingsView({ onBack, onToast, onDataChanged }: SettingsViewPro
   const [syncPass, setSyncPass] = useState('')
   const [hasPassphrase, setHasPassphrase] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [dark, setDark] = useState(
+    () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'),
+  )
+
+  const toggleDark = () => {
+    const next = !dark
+    setDark(next)
+    if (next) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('memo-dark', '1')
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.removeItem('memo-dark')
+    }
+  }
 
   useEffect(() => {
     request<Config>('GET', '/api/config')
@@ -334,6 +349,29 @@ export function SettingsView({ onBack, onToast, onDataChanged }: SettingsViewPro
 {`POST ${window.location.origin}/v1/memo
 {"content": "随手记一条 #测试"}`}
         </pre>
+      </div>
+
+      {/* 外观 */}
+      <h3 className="mt-7 mb-3 text-[13px] font-semibold text-flomo-ink">外观</h3>
+      <div className="rounded-xl bg-flomo-card border border-flomo-line px-5 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-[13px] text-flomo-ink font-medium">暗黑模式</div>
+            <div className="text-[11px] text-flomo-faint mt-0.5">深色主题，夜间使用更舒适</div>
+          </div>
+          <button
+            onClick={toggleDark}
+            className={`relative w-10 h-[22px] rounded-full transition-colors ${
+              dark ? 'bg-flomo-green' : 'bg-flomo-line'
+            }`}
+          >
+            <span
+              className={`absolute top-[2px] w-[18px] h-[18px] rounded-full bg-white shadow transition-all ${
+                dark ? 'left-[20px]' : 'left-[2px]'
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 flex justify-end">

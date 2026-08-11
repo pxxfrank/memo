@@ -69,7 +69,7 @@ List<RichSpan> parseInline(String text) {
 /// 渲染为 TextSpan（含缩进/列表标记，行内加粗/下划线/标签高亮）
 TextSpan richToSpan(String content, {TextStyle? baseStyle}) {
   final base = baseStyle ??
-      const TextStyle(color: AppColors.ink, fontSize: 14.5, height: 1.65);
+      TextStyle(color: AppColors.ink, fontSize: 14.5, height: 1.65);
   final children = <TextSpan>[];
   final lines = parseRich(content);
   var ol = 0;
@@ -91,7 +91,7 @@ TextSpan richToSpan(String content, {TextStyle? baseStyle}) {
         case SpanType.bold:
           children.add(TextSpan(
               text: s.text,
-              style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink)));
+              style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink)));
         case SpanType.underline:
           children.add(TextSpan(
               text: s.text,
@@ -102,7 +102,7 @@ TextSpan richToSpan(String content, {TextStyle? baseStyle}) {
         case SpanType.tag:
           children.add(TextSpan(
               text: s.text,
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColors.greendark, fontWeight: FontWeight.w600)));
         case SpanType.text:
           children.add(TextSpan(text: s.text));

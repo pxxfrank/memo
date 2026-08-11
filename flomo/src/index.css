@@ -4,6 +4,17 @@
 
 @layer base {
   :root {
+    --flomo-bg: 247 246 243;
+    --flomo-sidebar: 241 240 235;
+    --flomo-card: 255 255 255;
+    --flomo-line: 233 231 225;
+    --flomo-ink: 55 53 47;
+    --flomo-sub: 142 139 132;
+    --flomo-faint: 181 178 170;
+    --flomo-green: 67 181 129;
+    --flomo-greendark: 52 153 107;
+    --flomo-tagbg: 234 244 239;
+    --flomo-pin: 245 166 35;
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -35,6 +46,17 @@
   }
 
   .dark {
+    --flomo-bg: 26 25 24;
+    --flomo-sidebar: 33 32 30;
+    --flomo-card: 40 39 37;
+    --flomo-line: 58 57 54;
+    --flomo-ink: 233 231 226;
+    --flomo-sub: 168 165 158;
+    --flomo-faint: 128 126 120;
+    --flomo-green: 88 200 150;
+    --flomo-greendark: 110 218 172;
+    --flomo-tagbg: 38 56 48;
+    --flomo-pin: 245 184 96;
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;

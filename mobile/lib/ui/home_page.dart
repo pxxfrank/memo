@@ -66,9 +66,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('MEMO'),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 12),
             child: Center(
               child: Text('本地私有 · 云同步',
                   style: TextStyle(color: AppColors.faint, fontSize: 11)),
@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
               focusNode: _focus,
               maxLines: 3,
               minLines: 1,
-              style: const TextStyle(color: AppColors.ink, fontSize: 15, height: 1.5),
+              style: TextStyle(color: AppColors.ink, fontSize: 15, height: 1.5),
               decoration: const InputDecoration(
                 hintText: '现在的想法是……',
                 filled: false,
@@ -191,18 +191,18 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildTimeline() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.green));
+      return Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.green));
     }
     if (_memos.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.notes, size: 40, color: AppColors.faint),
+            Icon(Icons.notes, size: 40, color: AppColors.faint),
             const SizedBox(height: 10),
             Text(
               _activeTag == null ? '还没有笔记，写下第一条吧' : '该标签下没有笔记',
-              style: const TextStyle(color: AppColors.faint, fontSize: 13.5),
+              style: TextStyle(color: AppColors.faint, fontSize: 13.5),
             ),
           ],
         ),

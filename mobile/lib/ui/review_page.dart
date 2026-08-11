@@ -57,7 +57,7 @@ class _ReviewPageState extends State<ReviewPage> {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
               children: [
-                const Text('随机翻出过去的笔记，让记忆重新浮现',
+                Text('随机翻出过去的笔记，让记忆重新浮现',
                     style: TextStyle(color: AppColors.faint, fontSize: 12)),
                 const Spacer(),
                 FilledButton.icon(
@@ -79,7 +79,7 @@ class _ReviewPageState extends State<ReviewPage> {
 
   Widget _buildBody() {
     if (_cards == null) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.green));
     }
     if (_cards!.isEmpty) {
@@ -89,7 +89,7 @@ class _ReviewPageState extends State<ReviewPage> {
           children: [
             const Text('🎲', style: TextStyle(fontSize: 34)),
             const SizedBox(height: 8),
-            const Text('还没有可回顾的笔记，先去记几条吧',
+            Text('还没有可回顾的笔记，先去记几条吧',
                 style: TextStyle(color: AppColors.faint, fontSize: 13)),
           ],
         ),
@@ -113,21 +113,21 @@ class _ReviewPageState extends State<ReviewPage> {
             children: [
               Text.rich(richToSpan(m.content,
                   baseStyle:
-                      const TextStyle(color: AppColors.ink, fontSize: 15, height: 1.8))),
+                      TextStyle(color: AppColors.ink, fontSize: 15, height: 1.8))),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Text('📅 ${_dayLabel(m.createdAt)}',
-                      style: const TextStyle(color: AppColors.faint, fontSize: 11)),
+                      style: TextStyle(color: AppColors.faint, fontSize: 11)),
                   const SizedBox(width: 8),
                   Text(
                     '${DateTime.fromMillisecondsSinceEpoch(m.createdAt).hour.toString().padLeft(2, '0')}:'
                     '${DateTime.fromMillisecondsSinceEpoch(m.createdAt).minute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(color: AppColors.faint, fontSize: 11),
+                    style: TextStyle(color: AppColors.faint, fontSize: 11),
                   ),
                   if (m.pinned) ...[
                     const SizedBox(width: 8),
-                    const Text('📌 置顶', style: TextStyle(color: AppColors.pin, fontSize: 11)),
+                    Text('📌 置顶', style: TextStyle(color: AppColors.pin, fontSize: 11)),
                   ],
                 ],
               ),

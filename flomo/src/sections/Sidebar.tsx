@@ -40,7 +40,9 @@ export function Sidebar({
 }: SidebarProps) {
   const navBtn = (active: boolean) =>
     `w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors ${
-      active ? 'bg-white text-flomo-ink font-medium shadow-sm' : 'text-flomo-sub hover:bg-white/60 hover:text-flomo-ink'
+      active
+        ? 'bg-white text-flomo-ink font-medium shadow-sm dark:bg-flomo-card dark:text-flomo-ink'
+        : 'text-flomo-sub hover:bg-white/60 hover:text-flomo-ink dark:hover:bg-white/10 dark:hover:text-flomo-ink'
     }`
   return (
     <aside className="hidden md:flex w-[248px] shrink-0 flex-col bg-flomo-sidebar border-r border-flomo-line h-screen sticky top-0">
@@ -55,7 +57,7 @@ export function Sidebar({
 
       {/* Search */}
       <div className="px-4 pb-3">
-        <div className="flex items-center gap-2 rounded-lg bg-white/70 border border-flomo-line px-3 h-9 focus-within:border-flomo-green/50 transition-colors">
+        <div className="flex items-center gap-2 rounded-lg bg-white/70 border border-flomo-line px-3 h-9 focus-within:border-flomo-green/50 transition-colors dark:bg-white/5">
           <Search className="w-3.5 h-3.5 text-flomo-faint" />
           <input
             value={search}
@@ -121,8 +123,8 @@ export function Sidebar({
             onClick={() => onTagClick(activeTag === t.name ? null : t.name)}
             className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-colors ${
               activeTag === t.name
-                ? 'bg-white text-flomo-ink font-medium shadow-sm'
-                : 'text-flomo-sub hover:bg-white/60 hover:text-flomo-ink'
+                ? 'bg-white text-flomo-ink font-medium shadow-sm dark:bg-flomo-card dark:text-flomo-ink'
+                : 'text-flomo-sub hover:bg-white/60 hover:text-flomo-ink dark:hover:bg-white/10 dark:hover:text-flomo-ink'
             }`}
           >
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: tagColor(t.name) }} />

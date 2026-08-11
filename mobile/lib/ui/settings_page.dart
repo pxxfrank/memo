@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../services/app_settings.dart';
 import '../services/sync_controller.dart';
 import 'theme.dart';
-
 class SettingsPage extends StatefulWidget {
   /// tab 模式下隐藏返回按钮
   final bool showBack;
@@ -63,11 +62,11 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final inputCls = InputDecoration(
-      hintStyle: const TextStyle(color: AppColors.faint, fontSize: 13),
-      labelStyle: const TextStyle(color: AppColors.sub, fontSize: 12),
+      hintStyle: TextStyle(color: AppColors.faint, fontSize: 13),
+      labelStyle: TextStyle(color: AppColors.sub, fontSize: 12),
     );
     final label = (String t) => Text(t,
-        style: const TextStyle(color: AppColors.faint, fontSize: 11.5, fontWeight: FontWeight.w500));
+        style: TextStyle(color: AppColors.faint, fontSize: 11.5, fontWeight: FontWeight.w500));
 
     return Scaffold(
       appBar: AppBar(
@@ -82,13 +81,13 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         padding: const EdgeInsets.all(14),
         children: [
-          const Text('云同步（坚果云）',
+          Text('云同步（坚果云）',
               style: TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
           Text(
             '手机与桌面各自本地编辑，经坚果云交换加密变更日志实现双向同步。'
             '远程目录填坚果云 WebDAV 地址，如 https://dav.jianguoyun.com/dav/memo-sync。',
-            style: const TextStyle(color: AppColors.faint, fontSize: 12, height: 1.6),
+            style: TextStyle(color: AppColors.faint, fontSize: 12, height: 1.6),
           ),
           const SizedBox(height: 14),
           Container(
@@ -124,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         onPressed: _saving ? null : _save,
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.greendark,
-                          side: const BorderSide(color: AppColors.line),
+                          side: BorderSide(color: AppColors.line),
                           padding: const EdgeInsets.symmetric(vertical: 11),
                         ),
                         child: Text(_saving ? '保存中…' : '保存配置'),
@@ -153,11 +152,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             child: Text(
               _status ?? (SyncController.configured ? '已启用（每 15 秒自动同步）' : '未配置同步'),
-              style: const TextStyle(color: AppColors.sub, fontSize: 12),
+              style: TextStyle(color: AppColors.sub, fontSize: 12),
             ),
           ),
           const SizedBox(height: 24),
-          const Text('每日回顾',
+          Text('每日回顾',
               style: TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Container(
@@ -169,11 +168,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             child: Row(
               children: [
-                const Text('每次抽取条数',
+                Text('每次抽取条数',
                     style: TextStyle(color: AppColors.sub, fontSize: 13)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.remove_circle_outline, size: 20, color: AppColors.sub),
+                  icon: Icon(Icons.remove_circle_outline, size: 20, color: AppColors.sub),
                   onPressed: () async {
                     if (AppSettings.reviewCount > 1) {
                       AppSettings.reviewCount--;
@@ -183,10 +182,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 Text('${AppSettings.reviewCount}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w700)),
                 IconButton(
-                  icon: const Icon(Icons.add_circle_outline, size: 20, color: AppColors.green),
+                  icon: Icon(Icons.add_circle_outline, size: 20, color: AppColors.green),
                   onPressed: () async {
                     if (AppSettings.reviewCount < 10) {
                       AppSettings.reviewCount++;
@@ -199,10 +198,39 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('关于',
+          Text('外观',
               style: TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          const Text('MEMO 手机端 · Flutter 版\n数据存储于本机，云端仅交换加密日志。',
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.card,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.line),
+            ),
+            child: Row(
+              children: [
+                Text('暗黑模式',
+                    style: TextStyle(color: AppColors.sub, fontSize: 13)),
+                const Spacer(),
+                Switch(
+                  value: AppSettings.themeDark,
+                  activeThumbColor: AppColors.green,
+                  onChanged: (v) async {
+                    AppSettings.themeDark = v;
+                    await AppSettings.saveAll();
+                    AppTheme.apply(v);
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text('关于',
+              style: TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Text('MEMO 手机端 · Flutter 版\n数据存储于本机，云端仅交换加密日志。',
               style: TextStyle(color: AppColors.faint, fontSize: 12, height: 1.6)),
         ],
       ),

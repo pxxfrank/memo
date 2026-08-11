@@ -7,6 +7,12 @@
     <meta name="theme-color" content="#43B581" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/icon-192.png" />
+    <script>
+      // 暗黑模式：读取本地偏好并应用到 <html>（防闪烁）
+      if (localStorage.getItem('memo-dark') === '1') {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

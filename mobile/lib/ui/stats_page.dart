@@ -41,7 +41,7 @@ class _StatsPageState extends State<StatsPage> {
                 style: TextStyle(
                     fontSize: 20, fontWeight: FontWeight.w700, color: color ?? AppColors.greendark)),
             const SizedBox(height: 4),
-            Text(label, style: const TextStyle(color: AppColors.faint, fontSize: 11)),
+            Text(label, style: TextStyle(color: AppColors.faint, fontSize: 11)),
           ],
         ),
       ),
@@ -54,7 +54,7 @@ class _StatsPageState extends State<StatsPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('统计')),
       body: s == null
-          ? const Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.green))
+          ? Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.green))
           : ListView(
               padding: const EdgeInsets.all(14),
               children: [
@@ -74,7 +74,7 @@ class _StatsPageState extends State<StatsPage> {
                   _metric('标签', '${(s['topTags'] as List).length}'),
                 ]),
                 const SizedBox(height: 20),
-                const Text('标签排行',
+                Text('标签排行',
                     style: TextStyle(
                         color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
@@ -88,8 +88,8 @@ class _StatsPageState extends State<StatsPage> {
                   child: Column(
                     children: (s['topTags'] as List).isEmpty
                         ? [
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               child: Text('还没有标签，记笔记时用 #标签 即可',
                                   style: TextStyle(color: AppColors.faint, fontSize: 12)),
                             ),
@@ -108,7 +108,7 @@ class _StatsPageState extends State<StatsPage> {
                                       child: Text('#$name',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                               color: AppColors.ink, fontSize: 13)),
                                     ),
                                     Expanded(
@@ -124,7 +124,7 @@ class _StatsPageState extends State<StatsPage> {
                                     ),
                                     const SizedBox(width: 10),
                                     Text('$count',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             color: AppColors.sub, fontSize: 12)),
                                   ],
                                 ),

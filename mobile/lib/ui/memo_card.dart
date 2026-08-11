@@ -87,11 +87,11 @@ class MemoCard extends StatelessWidget {
             children: [
               Text(
                 formatTime(memo.createdAt),
-                style: const TextStyle(color: AppColors.faint, fontSize: 11),
+                style: TextStyle(color: AppColors.faint, fontSize: 11),
               ),
               if (memo.pinned) ...[
                 const SizedBox(width: 6),
-                const Icon(Icons.push_pin, size: 11, color: AppColors.pin),
+                Icon(Icons.push_pin, size: 11, color: AppColors.pin),
               ],
               const Spacer(),
               PopupMenuButton<String>(
