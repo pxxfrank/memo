@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { RefreshCcw, ArrowLeft } from 'lucide-react'
 import type { Memo } from '@/types/memo'
 import { request, toMemo, type MemoDTO } from '@/lib/api'
+import { RichContent } from '@/components/RichContent'
 
 interface ReviewViewProps {
   onBack: () => void
@@ -89,9 +90,7 @@ export function ReviewView({ onBack, onToast }: ReviewViewProps) {
               key={m.id}
               className="rounded-xl bg-flomo-card border border-flomo-line px-5 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
             >
-              <p className="whitespace-pre-wrap text-[15px] leading-[1.8] text-flomo-ink break-words">
-                {m.content}
-              </p>
+              <RichContent content={m.content} />
               <div className="mt-3 flex items-center gap-2 text-[11px] text-flomo-faint">
                 <span>📅 {dayLabel(m.createdAt)}</span>
                 <span>·</span>

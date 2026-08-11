@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 
 import '../db/database.dart';
 import '../models/memo.dart';
-import '../services/tags.dart';
+import '../services/rich_text.dart';
+import 'format_toolbar.dart';
 import 'theme.dart';
 
 class MemoCard extends StatelessWidget {
@@ -16,25 +17,38 @@ class MemoCard extends StatelessWidget {
     final ctrl = TextEditingController(text: memo.content);
     final text = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('编辑笔记'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          maxLines: 6,
-          minLines: 2,
-          decoration: const InputDecoration(
-            hintText: '修改内容……',
-            border: OutlineInputBorder(),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('编辑笔记'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: ctrl,
+                autofocus: true,
+                maxLines: 6,
+                minLines: 2,
+                decoration: const InputDecoration(
+                  hintText: '修改内容……',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              FormatToolbar(onFormat: (kind) {
+                applyFormat(ctrl, kind);
+                setDialogState(() {});
+              }),
+            ],
           ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              child: const Text('保存'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: const Text('保存'),
-          ),
-        ],
       ),
     );
     if (text != null && text.isNotEmpty && text != memo.content) {
@@ -66,18 +80,7 @@ class MemoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           RichText(
-            text: TextSpan(
-              style: const TextStyle(color: AppColors.ink, fontSize: 14.5, height: 1.65),
-              children: splitHighlight(memo.content)
-                  .map((s) => TextSpan(
-                        text: s.text,
-                        style: s.isTag
-                            ? const TextStyle(
-                                color: AppColors.greendark, fontWeight: FontWeight.w600)
-                            : null,
-                      ))
-                  .toList(),
-            ),
+            text: richToSpan(memo.content),
           ),
           const SizedBox(height: 8),
           Row(

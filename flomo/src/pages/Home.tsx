@@ -9,6 +9,8 @@ import { StatsView } from '@/sections/StatsView'
 import { SettingsView } from '@/sections/SettingsView'
 import { X } from 'lucide-react'
 import type { Memo } from '@/types/memo'
+import { applyFormat, type FormatKind } from '@/lib/rich'
+import { FormatToolbar } from '@/components/FormatToolbar'
 
 function useToast() {
   const [msg, setMsg] = useState<string | null>(null)
@@ -29,6 +31,7 @@ export default function Home() {
   const [pinnedOnly, setPinnedOnly] = useState(false)
   const [editing, setEditing] = useState<Memo | null>(null)
   const [editText, setEditText] = useState('')
+  const editRef = useRef<HTMLTextAreaElement>(null)
   const { msg, show } = useToast()
 
   const goTimeline = () => setView('timeline')
@@ -149,12 +152,23 @@ export default function Home() {
           >
             <h3 className="text-[15px] font-semibold mb-3">编辑笔记</h3>
             <textarea
+              ref={editRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               rows={5}
               autoFocus
               className="w-full resize-none rounded-lg border border-flomo-line bg-flomo-bg px-3.5 py-3 text-[14px] leading-relaxed outline-none focus:border-flomo-green/60 transition-colors"
             />
+            <div className="mt-2 flex items-center gap-1">
+              <FormatToolbar
+                onFormat={(kind: FormatKind) => {
+                  const el = editRef.current
+                  if (!el) return
+                  applyFormat(el, kind)
+                  setEditText(el.value)
+                }}
+              />
+            </div>
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setEditing(null)}

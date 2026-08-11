@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../models/memo.dart';
 import '../services/app_settings.dart';
+import '../services/rich_text.dart';
 import 'theme.dart';
 
 /// 每日回顾：历史优先，随机翻出 N 条
@@ -110,8 +111,9 @@ class _ReviewPageState extends State<ReviewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(m.content,
-                  style: const TextStyle(color: AppColors.ink, fontSize: 15, height: 1.8)),
+              Text.rich(richToSpan(m.content,
+                  baseStyle:
+                      const TextStyle(color: AppColors.ink, fontSize: 15, height: 1.8))),
               const SizedBox(height: 8),
               Row(
                 children: [

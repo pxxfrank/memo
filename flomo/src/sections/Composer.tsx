@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Image, Hash, Sparkles, SendHorizontal } from 'lucide-react'
+import { Hash, SendHorizontal } from 'lucide-react'
+import { applyFormat, type FormatKind } from '@/lib/rich'
+import { FormatToolbar } from '@/components/FormatToolbar'
 
 interface ComposerProps {
   onSubmit: (content: string) => void
@@ -42,24 +44,20 @@ export function Composer({ onSubmit }: ComposerProps) {
         className="w-full resize-none bg-transparent px-4 pt-4 pb-2 text-[15px] leading-relaxed text-flomo-ink outline-none placeholder:text-flomo-faint"
       />
       <div className="flex items-center gap-1 px-3 pb-3">
-        <button
-          title="插入图片"
-          className="p-2 rounded-lg text-flomo-faint hover:text-flomo-greendark hover:bg-flomo-tagbg transition-colors"
-        >
-          <Image className="w-[18px] h-[18px]" />
-        </button>
+        <FormatToolbar
+          onFormat={(kind: FormatKind) => {
+            const el = ref.current
+            if (!el) return
+            applyFormat(el, kind)
+            setValue(el.value)
+          }}
+        />
         <button
           title="插入标签"
           onClick={() => setValue((v) => v + (v.endsWith(' ') || v === '' ? '' : ' ') + '#')}
           className="p-2 rounded-lg text-flomo-faint hover:text-flomo-greendark hover:bg-flomo-tagbg transition-colors"
         >
           <Hash className="w-[18px] h-[18px]" />
-        </button>
-        <button
-          title="AI 联想"
-          className="p-2 rounded-lg text-flomo-faint hover:text-flomo-greendark hover:bg-flomo-tagbg transition-colors"
-        >
-          <Sparkles className="w-[18px] h-[18px]" />
         </button>
         <span className="ml-auto hidden sm:block text-[11px] text-flomo-faint mr-2">Ctrl + Enter 发送</span>
         <button

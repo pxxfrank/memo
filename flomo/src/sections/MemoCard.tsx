@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pin, PinOff, Copy, Check, Pencil, Trash2 } from 'lucide-react'
 import type { Memo } from '@/types/memo'
+import { RichContent } from '@/components/RichContent'
 
 interface MemoCardProps {
   memo: Memo
@@ -8,29 +9,6 @@ interface MemoCardProps {
   onRemove: (id: number) => void
   onEdit: (memo: Memo) => void
   onTagClick: (tag: string) => void
-}
-
-/** 把 #标签 渲染成绿色可点击的片段 */
-function renderContent(content: string, onTagClick: (tag: string) => void) {
-  const parts = content.split(/(#[^\s#]+)/g)
-  return parts.map((part, i) => {
-    if (part.startsWith('#')) {
-      const tag = part.slice(1).replace(/[，。！？；、,.!?;:]+$/, '')
-      return (
-        <button
-          key={i}
-          onClick={(e) => {
-            e.stopPropagation()
-            onTagClick(tag)
-          }}
-          className="text-flomo-greendark hover:underline underline-offset-2"
-        >
-          {part}
-        </button>
-      )
-    }
-    return <span key={i}>{part}</span>
-  })
 }
 
 export function MemoCard({ memo, onTogglePin, onRemove, onEdit, onTagClick }: MemoCardProps) {
@@ -60,9 +38,7 @@ export function MemoCard({ memo, onTogglePin, onRemove, onEdit, onTagClick }: Me
           置顶
         </div>
       )}
-      <p className="whitespace-pre-wrap text-[14px] leading-[1.75] text-flomo-ink break-words">
-        {renderContent(memo.content, onTagClick)}
-      </p>
+      <RichContent content={memo.content} onTagClick={onTagClick} />
       <div className="mt-2 flex items-center">
         <span className="text-[11px] text-flomo-faint">{hhmm}</span>
         <div className="ml-auto flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">

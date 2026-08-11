@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import '../db/database.dart';
 import '../models/memo.dart';
+import '../services/rich_text.dart';
+import 'format_toolbar.dart';
 import 'memo_card.dart';
 import 'theme.dart';
 
@@ -125,16 +127,10 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             child: Row(
               children: [
-                IconButton(
-                  tooltip: '插入标签',
-                  icon: const Icon(Icons.tag, size: 19, color: AppColors.faint),
-                  onPressed: () {
-                    final v = _composer.text;
-                    _composer.text = v.isEmpty || v.endsWith(' ') ? '$v#' : '$v #';
-                    _composer.selection = TextSelection.collapsed(offset: _composer.text.length);
-                    _focus.requestFocus();
-                  },
-                ),
+                FormatToolbar(onFormat: (kind) {
+                  applyFormat(_composer, kind);
+                  setState(() {});
+                }),
                 const Spacer(),
                 Text(
                   'Ctrl+Enter 发送',
