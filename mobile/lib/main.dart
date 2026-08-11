@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'services/sync_controller.dart';
-import 'ui/home_page.dart';
+import 'ui/main_shell.dart';
 import 'ui/theme.dart';
 
 Future<void> main() async {
@@ -19,7 +19,7 @@ class MemoApp extends StatelessWidget {
       title: 'MEMO',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
-      home: const HomePage(),
+      home: const MainShell(),
     );
   }
 }

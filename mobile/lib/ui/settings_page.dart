@@ -5,7 +5,9 @@ import '../services/sync_controller.dart';
 import 'theme.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  /// tab 模式下隐藏返回按钮
+  final bool showBack;
+  const SettingsPage({super.key, this.showBack = true});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -69,10 +71,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 17),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: widget.showBack
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 17),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: const Text('设置'),
       ),
       body: ListView(
@@ -150,6 +154,48 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Text(
               _status ?? (SyncController.configured ? '已启用（每 15 秒自动同步）' : '未配置同步'),
               style: const TextStyle(color: AppColors.sub, fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text('每日回顾',
+              style: TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.card,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.line),
+            ),
+            child: Row(
+              children: [
+                const Text('每次抽取条数',
+                    style: TextStyle(color: AppColors.sub, fontSize: 13)),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline, size: 20, color: AppColors.sub),
+                  onPressed: () async {
+                    if (AppSettings.reviewCount > 1) {
+                      AppSettings.reviewCount--;
+                      await AppSettings.saveAll();
+                      setState(() {});
+                    }
+                  },
+                ),
+                Text('${AppSettings.reviewCount}',
+                    style: const TextStyle(
+                        color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w700)),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline, size: 20, color: AppColors.green),
+                  onPressed: () async {
+                    if (AppSettings.reviewCount < 10) {
+                      AppSettings.reviewCount++;
+                      await AppSettings.saveAll();
+                      setState(() {});
+                    }
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),

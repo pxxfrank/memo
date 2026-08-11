@@ -9,6 +9,7 @@ class AppSettings {
   static String appPassword = '';  // 坚果云应用密码
   static String passphrase = '';   // 同步口令（端到端加密，各端一致）
   static String salt = '';         // hex；首次由本端生成，可从远端日志自动对齐
+  static int reviewCount = 3;      // 每日回顾抽取条数
 
   static Future<void> load() async {
     final sp = await SharedPreferences.getInstance();
@@ -17,6 +18,7 @@ class AppSettings {
     appPassword = sp.getString('sync_pass') ?? '';
     passphrase = sp.getString('sync_phrase') ?? '';
     salt = sp.getString('sync_salt') ?? '';
+    reviewCount = sp.getInt('review_count') ?? 3;
   }
 
   static Future<void> saveAll() async {
@@ -26,6 +28,7 @@ class AppSettings {
     await sp.setString('sync_pass', appPassword);
     await sp.setString('sync_phrase', passphrase);
     await sp.setString('sync_salt', salt);
+    await sp.setInt('review_count', reviewCount);
   }
 
   static Future<void> saveSalt(String saltHex) async {

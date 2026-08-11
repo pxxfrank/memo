@@ -227,4 +227,29 @@ class MemoDb {
     if (rows.isEmpty) return null;
     return Memo.fromMap(rows.first);
   }
+
+  /// 统计（回顾/统计页用）
+  static Future<Map<String, Object?>> stats() async {
+    final d = await db;
+    final now = DateTime.now();
+    final week = now.subtract(const Duration(days: 7)).millisecondsSinceEpoch;
+    final month = now.subtract(const Duration(days: 30)).millisecondsSinceEpoch;
+    Future<int> c(String sql, [List<Object?>? args]) async =>
+        Sqflite.firstIntValue(await d.rawQuery(sql, args)) ?? 0;
+    final total = await c('SELECT COUNT(*) FROM memos');
+    final weekCount = await c('SELECT COUNT(*) FROM memos WHERE created_at >= ?', [week]);
+    final monthCount = await c('SELECT COUNT(*) FROM memos WHERE created_at >= ?', [month]);
+    final chars = await c('SELECT SUM(LENGTH(content)) FROM memos');
+    final pinned = await c('SELECT COUNT(*) FROM memos WHERE pinned = 1');
+    final topTags = await d.query('tags',
+        where: 'count > 0', orderBy: 'count DESC, name ASC', limit: 8);
+    return {
+      'total': total,
+      'week': weekCount,
+      'month': monthCount,
+      'chars': chars,
+      'pinned': pinned,
+      'topTags': topTags,
+    };
+  }
 }

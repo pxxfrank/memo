@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import '../db/database.dart';
 import '../models/memo.dart';
 import 'memo_card.dart';
-import 'settings_page.dart';
 import 'theme.dart';
 
 class HomePage extends StatefulWidget {
@@ -65,16 +64,14 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('MEMO'),
-        actions: [
-          IconButton(
-            tooltip: '设置',
-            icon: const Icon(Icons.settings_outlined, size: 20, color: AppColors.sub),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const SettingsPage()));
-            },
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: Center(
+              child: Text('本地私有 · 云同步',
+                  style: TextStyle(color: AppColors.faint, fontSize: 11)),
+            ),
           ),
-          const SizedBox(width: 6),
         ],
       ),
       body: CallbackShortcuts(
