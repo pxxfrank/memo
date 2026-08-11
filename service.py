@@ -59,7 +59,7 @@ DB_PATH = DATA_DIR / "memo.db"
 CONFIG_PATH = DATA_DIR / "config.json"
 DEFAULT_PORT = 8899
 HOST = "127.0.0.1"
-APP_VERSION = "1.1.0"  # 版本迭代时同步更新（见 CLAUDE.md 版本规范）
+APP_VERSION = "1.2.0"  # 版本迭代时同步更新（见 CLAUDE.md 版本规范）
 
 DEFAULT_CONFIG = {
     "hotkey": "ctrl+shift+m",   # 全局热键：呼出快速记录窗

@@ -11,7 +11,7 @@ function Record($id, $ok, $note) {
 $desktop = 'G:\AI_Project\06-New flomo\desktop'
 $release = "$desktop\release"
 $unpacked = "$release\win-unpacked"
-$setup = "$release\MEMO-笔记-Setup-1.1.0.exe"
+$setup = "$release\MEMO-笔记-Setup-1.2.0.exe"
 
 Get-Process electron, memo-backend -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Seconds 1
@@ -77,3 +77,4 @@ foreach ($r in $results | Where-Object { -not $_.OK }) {
     Write-Host "  FAILED: $($r.Id) $($r.Note)"
 }
 exit $(if ($passed -eq $results.Count) { 0 } else { 1 })
+

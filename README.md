@@ -1,198 +1,199 @@
-# MEMO · flomo 平替（本地私有版）
+﻿# MEMO 路 flomo 骞虫浛锛堟湰鍦扮鏈夌増锛?
 
-像发微博一样记笔记，数据 100% 保存在本地。保留 flomo 的核心特性：快速记录、标签体系、时间线、每日回顾、随机漫步、全文搜索、统计、导出、API 写入、MCP 供 AI 读取；**不含语音输入**。
+鍍忓彂寰崥涓€鏍疯绗旇锛屾暟鎹?100% 淇濆瓨鍦ㄦ湰鍦般€備繚鐣?flomo 鐨勬牳蹇冪壒鎬э細蹇€熻褰曘€佹爣绛句綋绯汇€佹椂闂寸嚎銆佹瘡鏃ュ洖椤俱€侀殢鏈烘极姝ャ€佸叏鏂囨悳绱€佺粺璁°€佸鍑恒€丄PI 鍐欏叆銆丮CP 渚?AI 璇诲彇锛?*涓嶅惈璇煶杈撳叆**銆?
 
-## 桌面版（推荐）
+## 妗岄潰鐗堬紙鎺ㄨ崘锛?
 
-安装 `desktop/release/MEMO-笔记-Setup-1.1.0.exe`：
+瀹夎 `desktop/release/MEMO-绗旇-Setup-1.1.0.exe`锛?
 
-- 开始菜单 / 桌面图标打开**独立窗口**（UI 与网页版一致）
-- **数据本地私有**：`%APPDATA%\memo\data\memo.db`（SQLite）
-- 内置**托盘**（右下角图标）、**全局热键**（Ctrl+Shift+M 任意界面快速记录，设置可改）、**每日回顾通知**
-- 桌面版使用端口 **8900**；旧网页版（8899）可共存，二选一使用即可
-- 首次使用前把旧数据迁移到新数据目录（见下方"数据迁移"）
+- 寮€濮嬭彍鍗?/ 妗岄潰鍥炬爣鎵撳紑**鐙珛绐楀彛**锛圲I 涓庣綉椤电増涓€鑷达級
+- **鏁版嵁鏈湴绉佹湁**锛歚%APPDATA%\memo\data\memo.db`锛圫QLite锛?
+- 鍐呯疆**鎵樼洏**锛堝彸涓嬭鍥炬爣锛夈€?*鍏ㄥ眬鐑敭**锛圕trl+Shift+M 浠绘剰鐣岄潰蹇€熻褰曪紝璁剧疆鍙敼锛夈€?*姣忔棩鍥為【閫氱煡**
+- 妗岄潰鐗堜娇鐢ㄧ鍙?**8900**锛涙棫缃戦〉鐗堬紙8899锛夊彲鍏卞瓨锛屼簩閫変竴浣跨敤鍗冲彲
+- 棣栨浣跨敤鍓嶆妸鏃ф暟鎹縼绉诲埌鏂版暟鎹洰褰曪紙瑙佷笅鏂?鏁版嵁杩佺Щ"锛?
 
-> 重新打包安装程序：先 `PyInstaller` 重打后端（见下），再在 `desktop/` 下执行 `npm run dist`。
+> 閲嶆柊鎵撳寘瀹夎绋嬪簭锛氬厛 `PyInstaller` 閲嶆墦鍚庣锛堣涓嬶級锛屽啀鍦?`desktop/` 涓嬫墽琛?`npm run dist`銆?
 
-## 网页版（轻量模式）
+## 缃戦〉鐗堬紙杞婚噺妯″紡锛?
 
 ```bat
-start.bat   # 或 python service.py --open（端口 8899，浏览器打开）
+start.bat   # 鎴?python service.py --open锛堢鍙?8899锛屾祻瑙堝櫒鎵撳紑锛?
 ```
 
-浏览器 / PWA 使用，数据在项目目录 `memo.db`。适合不想安装、临时使用的场景。
+娴忚鍣?/ PWA 浣跨敤锛屾暟鎹湪椤圭洰鐩綍 `memo.db`銆傞€傚悎涓嶆兂瀹夎銆佷复鏃朵娇鐢ㄧ殑鍦烘櫙銆?
 
-## 功能
+## 鍔熻兘
 
-| 功能 | 说明 |
+| 鍔熻兘 | 璇存槑 |
 |---|---|
-| 快速记录 | 主输入框 Ctrl+Enter 保存，新笔记置顶 |
-| 全局热键快速记录 | 任意界面按 **Ctrl+Shift+M** 呼出小窗（替代微信输入） |
-| 标签体系 | `#标签`、多级 `#父/子`，自动解析、侧栏筛选 |
-| 时间线 | 按天分组（今天/昨天/日期），置顶笔记优先 |
-| 全文搜索 | 关键词 + 标签叠加筛选 |
-| 每日回顾 | 设定时间随机回顾历史笔记（系统通知），也可手动 🎲 |
-| 数据统计 | 连续记录天数、近一年热力图、本周新增、常用标签 |
-| 导出/导入 | JSON / Markdown / CSV，可迁移备份 |
-| 编辑 / 置顶 / 删除 / 复制 | 卡片悬浮操作 |
-| PWA | 网页版可安装为应用 |
-| MCP | 供 AI Agent 按标签/日期范围读取与写入 |
-| 私有 | 全部数据本地存储，零上传 |
+| 蹇€熻褰?| 涓昏緭鍏ユ Ctrl+Enter 淇濆瓨锛屾柊绗旇缃《 |
+| 鍏ㄥ眬鐑敭蹇€熻褰?| 浠绘剰鐣岄潰鎸?**Ctrl+Shift+M** 鍛煎嚭灏忕獥锛堟浛浠ｅ井淇¤緭鍏ワ級 |
+| 鏍囩浣撶郴 | `#鏍囩`銆佸绾?`#鐖?瀛恅锛岃嚜鍔ㄨВ鏋愩€佷晶鏍忕瓫閫?|
+| 鏃堕棿绾?| 鎸夊ぉ鍒嗙粍锛堜粖澶?鏄ㄥぉ/鏃ユ湡锛夛紝缃《绗旇浼樺厛 |
+| 鍏ㄦ枃鎼滅储 | 鍏抽敭璇?+ 鏍囩鍙犲姞绛涢€?|
+| 姣忔棩鍥為【 | 璁惧畾鏃堕棿闅忔満鍥為【鍘嗗彶绗旇锛堢郴缁熼€氱煡锛夛紝涔熷彲鎵嬪姩 馃幉 |
+| 鏁版嵁缁熻 | 杩炵画璁板綍澶╂暟銆佽繎涓€骞寸儹鍔涘浘銆佹湰鍛ㄦ柊澧炪€佸父鐢ㄦ爣绛?|
+| 瀵煎嚭/瀵煎叆 | JSON / Markdown / CSV锛屽彲杩佺Щ澶囦唤 |
+| 缂栬緫 / 缃《 / 鍒犻櫎 / 澶嶅埗 | 鍗＄墖鎮诞鎿嶄綔 |
+| PWA | 缃戦〉鐗堝彲瀹夎涓哄簲鐢?|
+| MCP | 渚?AI Agent 鎸夋爣绛?鏃ユ湡鑼冨洿璇诲彇涓庡啓鍏?|
+| 绉佹湁 | 鍏ㄩ儴鏁版嵁鏈湴瀛樺偍锛岄浂涓婁紶 |
 
-## 云同步（坚果云 · 变更日志方案）
+## 浜戝悓姝ワ紙鍧氭灉浜?路 鍙樻洿鏃ュ織鏂规锛?
 
-桌面端与手机端各自本地编辑，经坚果云**交换变更日志**实现双向同步（详见 `SYNC-DESIGN.md`）。核心原则：坚果云只传输小文本日志，**绝不直接同步 SQLite 文件**（避免损坏）。
+妗岄潰绔笌鎵嬫満绔悇鑷湰鍦扮紪杈戯紝缁忓潥鏋滀簯**浜ゆ崲鍙樻洿鏃ュ織**瀹炵幇鍙屽悜鍚屾锛堣瑙?`SYNC-DESIGN.md`锛夈€傛牳蹇冨師鍒欙細鍧氭灉浜戝彧浼犺緭灏忔枃鏈棩蹇楋紝**缁濅笉鐩存帴鍚屾 SQLite 鏂囦欢**锛堥伩鍏嶆崯鍧忥級銆?
 
-- 桌面端写操作自动追加日志到 `{坚果云目录}/desktop.jsonl`，并定时（15s）拉取其他设备日志合并
-- 合并规则：按 `id + ts`，后写者胜（last-write-wins）；删除走墓碑，可跨设备生效
-- 每端设备名必须不同：桌面端 `--device desktop`（默认），手机端 `--device mobile`
-- 首次启用时自动把存量数据 dump 为全量日志，新设备可从日志完整重建
-- **端到端加密（可选）**：设置页填写"同步口令"后，日志以 AES-256-GCM 密文存储（PBKDF2 派生密钥），
-  坚果云/账号泄露者只能看到密文；所有设备须使用同一口令；旧明文日志自动无损转换为密文
+- 妗岄潰绔啓鎿嶄綔鑷姩杩藉姞鏃ュ織鍒?`{鍧氭灉浜戠洰褰晑/desktop.jsonl`锛屽苟瀹氭椂锛?5s锛夋媺鍙栧叾浠栬澶囨棩蹇楀悎骞?
+- 鍚堝苟瑙勫垯锛氭寜 `id + ts`锛屽悗鍐欒€呰儨锛坙ast-write-wins锛夛紱鍒犻櫎璧板纰戯紝鍙法璁惧鐢熸晥
+- 姣忕璁惧鍚嶅繀椤讳笉鍚岋細妗岄潰绔?`--device desktop`锛堥粯璁わ級锛屾墜鏈虹 `--device mobile`
+- 棣栨鍚敤鏃惰嚜鍔ㄦ妸瀛橀噺鏁版嵁 dump 涓哄叏閲忔棩蹇楋紝鏂拌澶囧彲浠庢棩蹇楀畬鏁撮噸寤?
+- **绔埌绔姞瀵嗭紙鍙€夛級**锛氳缃〉濉啓"鍚屾鍙ｄ护"鍚庯紝鏃ュ織浠?AES-256-GCM 瀵嗘枃瀛樺偍锛圥BKDF2 娲剧敓瀵嗛挜锛夛紝
+  鍧氭灉浜?璐﹀彿娉勯湶鑰呭彧鑳界湅鍒板瘑鏂囷紱鎵€鏈夎澶囬』浣跨敤鍚屼竴鍙ｄ护锛涙棫鏄庢枃鏃ュ織鑷姩鏃犳崯杞崲涓哄瘑鏂?
 
-**使用（当前为 API 配置，UI 即将上线）**：
-1. 在坚果云本地同步文件夹下建子目录，如 `D:\Nutstore\memo-sync`
-2. 设置页/接口配置：`POST /api/config {"sync":{"dir":"D:\\Nutstore\\memo-sync"}}`
-3. 之后写操作自动记录，每 15 秒自动同步；也可手动 `POST /api/sync/now`
-4. 手机端（未来 APP）用 `--device mobile` 指向同一目录
+**浣跨敤锛堝綋鍓嶄负 API 閰嶇疆锛孶I 鍗冲皢涓婄嚎锛?*锛?
+1. 鍦ㄥ潥鏋滀簯鏈湴鍚屾鏂囦欢澶逛笅寤哄瓙鐩綍锛屽 `D:\Nutstore\memo-sync`
+2. 璁剧疆椤?鎺ュ彛閰嶇疆锛歚POST /api/config {"sync":{"dir":"D:\\Nutstore\\memo-sync"}}`
+3. 涔嬪悗鍐欐搷浣滆嚜鍔ㄨ褰曪紝姣?15 绉掕嚜鍔ㄥ悓姝ワ紱涔熷彲鎵嬪姩 `POST /api/sync/now`
+4. 鎵嬫満绔紙鏈潵 APP锛夌敤 `--device mobile` 鎸囧悜鍚屼竴鐩綍
 
-## 局域网访问（手机用）
+## 灞€鍩熺綉璁块棶锛堟墜鏈虹敤锛?
 
-数据与桌面版**同一份**（`%APPDATA%\memo\data`），无需同步。
+鏁版嵁涓庢闈㈢増**鍚屼竴浠?*锛坄%APPDATA%\memo\data`锛夛紝鏃犻渶鍚屾銆?
 
-1. 双击 **`start_lan.bat`**（后端自带，无需 Python 环境）
-2. 手机连**同一 WiFi**，浏览器访问 `http://<电脑IP>:8901`（IP 用 `ipconfig` 查看，或看 bat 窗口提示）
-3. 首次访问输入**访问令牌**（令牌在 bat 窗口输出，或桌面版 → 设置 → 局域网访问 查看/复制）
+1. 鍙屽嚮 **`start_lan.bat`**锛堝悗绔嚜甯︼紝鏃犻渶 Python 鐜锛?
+2. 鎵嬫満杩?*鍚屼竴 WiFi**锛屾祻瑙堝櫒璁块棶 `http://<鐢佃剳IP>:8901`锛圛P 鐢?`ipconfig` 鏌ョ湅锛屾垨鐪?bat 绐楀彛鎻愮ず锛?
+3. 棣栨璁块棶杈撳叆**璁块棶浠ょ墝**锛堜护鐗屽湪 bat 绐楀彛杈撳嚭锛屾垨妗岄潰鐗?鈫?璁剧疆 鈫?灞€鍩熺綉璁块棶 鏌ョ湅/澶嶅埗锛?
 
-安全说明：
-- 仅监听局域网，非本机访问一律要求令牌（`Authorization: Bearer` / `X-Memo-Token` / `?token=`）
-- 本机访问（桌面版/网页版）免令牌，体验不变
-- 设置页可随时**重置令牌**（旧令牌立即失效）
-- 如需公网访问：先用 Tailscale / ZeroTier 组网，再访问组网 IP；**切勿直接端口映射暴露公网**
+瀹夊叏璇存槑锛?
+- 浠呯洃鍚眬鍩熺綉锛岄潪鏈満璁块棶涓€寰嬭姹備护鐗岋紙`Authorization: Bearer` / `X-Memo-Token` / `?token=`锛?
+- 鏈満璁块棶锛堟闈㈢増/缃戦〉鐗堬級鍏嶄护鐗岋紝浣撻獙涓嶅彉
+- 璁剧疆椤靛彲闅忔椂**閲嶇疆浠ょ墝**锛堟棫浠ょ墝绔嬪嵆澶辨晥锛?
+- 濡傞渶鍏綉璁块棶锛氬厛鐢?Tailscale / ZeroTier 缁勭綉锛屽啀璁块棶缁勭綉 IP锛?*鍒囧嬁鐩存帴绔彛鏄犲皠鏆撮湶鍏綉**
 
-## 架构（移动端预留）
+## 鏋舵瀯锛堢Щ鍔ㄧ棰勭暀锛?
 
 ```
-┌─ 前端（React，UI 层）─────────────────────────┐
-│  桌面窗口（Electron）· 网页/PWA · 未来移动端    │
-└───────────────┬──────────────────────────────┘
-                │ REST API（localhost:8900 / 8899）
-┌───────────────▼──────────────────────────────┐
-│ 后端（Python 服务 / 打包 exe）                 │
-│  笔记 API · 标签 · 统计 · 导出 · flomo 兼容写入 │
-│  SQLite（memo.db）本地存储                     │
-└──────────────────────────────────────────────┘
+鈹屸攢 鍓嶇锛圧eact锛孶I 灞傦級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
+鈹? 妗岄潰绐楀彛锛圗lectron锛壜?缃戦〉/PWA 路 鏈潵绉诲姩绔?   鈹?
+鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
+                鈹?REST API锛坙ocalhost:8900 / 8899锛?
+鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈻尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
+鈹?鍚庣锛圥ython 鏈嶅姟 / 鎵撳寘 exe锛?                鈹?
+鈹? 绗旇 API 路 鏍囩 路 缁熻 路 瀵煎嚭 路 flomo 鍏煎鍐欏叆 鈹?
+鈹? SQLite锛坢emo.db锛夋湰鍦板瓨鍌?                    鈹?
+鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
 ```
 
-移动端（安卓/iOS）无需重写：前端组件可复用（React Native / WebView），后端 REST API 直接部署到服务器即可远程访问，存储层不变。MCP 接口（`mcp_server.py`）同样可部署到服务器供云端 Agent 使用。
+绉诲姩绔紙瀹夊崜/iOS锛夋棤闇€閲嶅啓锛氬墠绔粍浠跺彲澶嶇敤锛圧eact Native / WebView锛夛紝鍚庣 REST API 鐩存帴閮ㄧ讲鍒版湇鍔″櫒鍗冲彲杩滅▼璁块棶锛屽瓨鍌ㄥ眰涓嶅彉銆侻CP 鎺ュ彛锛坄mcp_server.py`锛夊悓鏍峰彲閮ㄧ讲鍒版湇鍔″櫒渚涗簯绔?Agent 浣跨敤銆?
 
-## 安装与启动
+## 瀹夎涓庡惎鍔?
 
 ```bat
-pip install -r requirements.txt     # 安装依赖（pystray keyboard pillow）
-start.bat                           # 启动服务（开发/调试，带窗口）
+pip install -r requirements.txt     # 瀹夎渚濊禆锛坧ystray keyboard pillow锛?
+start.bat                           # 鍚姩鏈嶅姟锛堝紑鍙?璋冭瘯锛屽甫绐楀彛锛?
 ```
 
-启动后打开 http://127.0.0.1:8899/ 即可使用。
+鍚姩鍚庢墦寮€ http://127.0.0.1:8899/ 鍗冲彲浣跨敤銆?
 
-**开机自启（推荐）**：双击 `install_service.bat`，注册为登录自启的后台服务（无窗口、常驻托盘，提供热键与每日回顾推送）。卸载：`uninstall_service.bat`。
+**寮€鏈鸿嚜鍚紙鎺ㄨ崘锛?*锛氬弻鍑?`install_service.bat`锛屾敞鍐屼负鐧诲綍鑷惎鐨勫悗鍙版湇鍔★紙鏃犵獥鍙ｃ€佸父椹绘墭鐩橈紝鎻愪緵鐑敭涓庢瘡鏃ュ洖椤炬帹閫侊級銆傚嵏杞斤細`uninstall_service.bat`銆?
 
-> 注意：`start.bat` / `install_service.bat` 默认使用 `C:\Python314\python.exe`，若你的 Python 路径不同，请修改 bat 文件顶部的路径。
+> 娉ㄦ剰锛歚start.bat` / `install_service.bat` 榛樿浣跨敤 `C:\Python314\python.exe`锛岃嫢浣犵殑 Python 璺緞涓嶅悓锛岃淇敼 bat 鏂囦欢椤堕儴鐨勮矾寰勩€?
 
-## 常用操作
+## 甯哥敤鎿嶄綔
 
-- **记一条**：顶部输入框，Enter 保存
-- **标签**：正文写 `#工作/日报` 即自动归类；点侧栏标签筛选
-- **搜索**：顶部搜索框，可与标签叠加
-- **回顾**：右上 🎲 回顾（随机抽取历史笔记）；设置里可配每日定时回顾
-- **数据**：设置 → 导出/导入/清空
+- **璁颁竴鏉?*锛氶《閮ㄨ緭鍏ユ锛孍nter 淇濆瓨
+- **鏍囩**锛氭鏂囧啓 `#宸ヤ綔/鏃ユ姤` 鍗宠嚜鍔ㄥ綊绫伙紱鐐逛晶鏍忔爣绛剧瓫閫?
+- **鎼滅储**锛氶《閮ㄦ悳绱㈡锛屽彲涓庢爣绛惧彔鍔?
+- **鍥為【**锛氬彸涓?馃幉 鍥為【锛堥殢鏈烘娊鍙栧巻鍙茬瑪璁帮級锛涜缃噷鍙厤姣忔棩瀹氭椂鍥為【
+- **鏁版嵁**锛氳缃?鈫?瀵煎嚭/瀵煎叆/娓呯┖
 
-## 外部写入 API（flomo 兼容）
+## 澶栭儴鍐欏叆 API锛坒lomo 鍏煎锛?
 
-任何脚本/工具可向本地服务写入笔记：
+浠讳綍鑴氭湰/宸ュ叿鍙悜鏈湴鏈嶅姟鍐欏叆绗旇锛?
 
 ```bash
 curl -X POST http://127.0.0.1:8899/v1/memo \
   -H "Content-Type: application/json" \
-  -d '{"content": "随手记一条 #测试"}'
+  -d '{"content": "闅忔墜璁颁竴鏉?#娴嬭瘯"}'
 ```
 
-配合 PowerToys Run / 输入法快捷指令 / 自动化脚本，即可实现"全局任意时刻快速记录"（微信输入的本地替代）。
+閰嶅悎 PowerToys Run / 杈撳叆娉曞揩鎹锋寚浠?/ 鑷姩鍖栬剼鏈紝鍗冲彲瀹炵幇"鍏ㄥ眬浠绘剰鏃跺埢蹇€熻褰?锛堝井淇¤緭鍏ョ殑鏈湴鏇夸唬锛夈€?
 
-## 目录结构
+## 鐩綍缁撴瀯
 
 ```
-service.py          本地常驻服务（HTTP + API + 热键 + 托盘 + 回顾）
-app/                前端应用（React 构建产物 + PWA）
-flomo/              前端源码（React + Vite + Tailwind，改动后 npm run build 重新生成到 app/）
-memo.db             数据文件（SQLite，自动创建）
-config.json         配置（热键、回顾时间等，应用内可改）
-start.bat           手动启动
-install_service.bat 注册开机自启
-uninstall_service.bat 移除自启
+service.py          鏈湴甯搁┗鏈嶅姟锛圚TTP + API + 鐑敭 + 鎵樼洏 + 鍥為【锛?
+app/                鍓嶇搴旂敤锛圧eact 鏋勫缓浜х墿 + PWA锛?
+flomo/              鍓嶇婧愮爜锛圧eact + Vite + Tailwind锛屾敼鍔ㄥ悗 npm run build 閲嶆柊鐢熸垚鍒?app/锛?
+memo.db             鏁版嵁鏂囦欢锛圫QLite锛岃嚜鍔ㄥ垱寤猴級
+config.json         閰嶇疆锛堢儹閿€佸洖椤炬椂闂寸瓑锛屽簲鐢ㄥ唴鍙敼锛?
+start.bat           鎵嬪姩鍚姩
+install_service.bat 娉ㄥ唽寮€鏈鸿嚜鍚?
+uninstall_service.bat 绉婚櫎鑷惎
 ```
 
-前端为 Kimi 生成的 React 页面，数据层已改为对接本服务 API（`/api/memos`、`/api/stats`），与全局热键、托盘、每日回顾共用同一份本地数据。
+鍓嶇涓?Kimi 鐢熸垚鐨?React 椤甸潰锛屾暟鎹眰宸叉敼涓哄鎺ユ湰鏈嶅姟 API锛坄/api/memos`銆乣/api/stats`锛夛紝涓庡叏灞€鐑敭銆佹墭鐩樸€佹瘡鏃ュ洖椤惧叡鐢ㄥ悓涓€浠芥湰鍦版暟鎹€?
 
-## MCP 接口（供 AI Agent 读取/写入）
+## MCP 鎺ュ彛锛堜緵 AI Agent 璇诲彇/鍐欏叆锛?
 
-通过 [MCP](https://modelcontextprotocol.io) 协议，让 Claude Desktop、Cherry Studio、Cline、Cursor 等任何 AI 客户端读取本机笔记。**读取必须按范围进行**：支持标签、日期、关键词筛选 + 分页 + 截断，避免全文倒库。
+閫氳繃 [MCP](https://modelcontextprotocol.io) 鍗忚锛岃 Claude Desktop銆丆herry Studio銆丆line銆丆ursor 绛変换浣?AI 瀹㈡埛绔鍙栨湰鏈虹瑪璁般€?*璇诲彇蹇呴』鎸夎寖鍥磋繘琛?*锛氭敮鎸佹爣绛俱€佹棩鏈熴€佸叧閿瘝绛涢€?+ 鍒嗛〉 + 鎴柇锛岄伩鍏嶅叏鏂囧€掑簱銆?
 
-### 提供 6 个工具
+### 鎻愪緵 6 涓伐鍏?
 
-| 工具 | 说明 |
+| 宸ュ叿 | 璇存槑 |
 |---|---|
-| `list_tags()` | 所有标签及使用次数 |
-| `count_memos(tags?, start_date?, end_date?, query?)` | 先探数量再决定是否读取 |
-| `list_memos(tags?, start_date?, end_date?, query?, limit?, offset?, preview_length?)` | 范围筛选 + 分页 + 可选截断 |
-| `get_memo(memo_id)` | 单条全文 |
-| `add_memo(content, created_at?)` | 写入（支持 `#标签`、多级 `#父/子`） |
-| `get_stats()` | 总数 / 连续天数 / 本周新增 |
+| `list_tags()` | 鎵€鏈夋爣绛惧強浣跨敤娆℃暟 |
+| `count_memos(tags?, start_date?, end_date?, query?)` | 鍏堟帰鏁伴噺鍐嶅喅瀹氭槸鍚﹁鍙?|
+| `list_memos(tags?, start_date?, end_date?, query?, limit?, offset?, preview_length?)` | 鑼冨洿绛涢€?+ 鍒嗛〉 + 鍙€夋埅鏂?|
+| `get_memo(memo_id)` | 鍗曟潯鍏ㄦ枃 |
+| `add_memo(content, created_at?)` | 鍐欏叆锛堟敮鎸?`#鏍囩`銆佸绾?`#鐖?瀛恅锛?|
+| `get_stats()` | 鎬绘暟 / 杩炵画澶╂暟 / 鏈懆鏂板 |
 
-- `tags`：标签路径数组，如 `["工作"]` 会匹配 `工作/项目` 等全部子标签
-- 日期：`YYYY-MM-DD`，含边界，按本地时区
+- `tags`锛氭爣绛捐矾寰勬暟缁勶紝濡?`["宸ヤ綔"]` 浼氬尮閰?`宸ヤ綔/椤圭洰` 绛夊叏閮ㄥ瓙鏍囩
+- 鏃ユ湡锛歚YYYY-MM-DD`锛屽惈杈圭晫锛屾寜鏈湴鏃跺尯
 
-### 连接方式（二选一）
+### 杩炴帴鏂瑰紡锛堜簩閫変竴锛?
 
-**安装桌面版后，MCP 已内置**：`<安装目录>\resources\mcp\memo-mcp.exe`，自动读取桌面版数据目录（`%APPDATA%\memo\data\memo.db`），无需 Python 环境。
+**瀹夎妗岄潰鐗堝悗锛孧CP 宸插唴缃?*锛歚<瀹夎鐩綍>\resources\mcp\memo-mcp.exe`锛岃嚜鍔ㄨ鍙栨闈㈢増鏁版嵁鐩綍锛坄%APPDATA%\memo\data\memo.db`锛夛紝鏃犻渶 Python 鐜銆?
 
-**① stdio（Claude Desktop / 本地 CLI）**：配置启动命令即可，无需预启动。
+**鈶?stdio锛圕laude Desktop / 鏈湴 CLI锛?*锛氶厤缃惎鍔ㄥ懡浠ゅ嵆鍙紝鏃犻渶棰勫惎鍔ㄣ€?
 
-Claude Desktop 的 `claude_desktop_config.json`：
+Claude Desktop 鐨?`claude_desktop_config.json`锛?
 
 ```json
 {
   "mcpServers": {
     "memo": {
-      "command": "C:\\Program Files\\MEMO 笔记\\resources\\mcp\\memo-mcp.exe",
+      "command": "C:\\Program Files\\MEMO 绗旇\\resources\\mcp\\memo-mcp.exe",
       "args": []
     }
   }
 }
 ```
 
-> 安装目录默认 `C:\Program Files\MEMO 笔记`，若自定义安装目录请按实际路径填写；未安装桌面版时也可用源码模式（`C:\Python314\python.exe mcp_server.py`）。
+> 瀹夎鐩綍榛樿 `C:\Program Files\MEMO 绗旇`锛岃嫢鑷畾涔夊畨瑁呯洰褰曡鎸夊疄闄呰矾寰勫～鍐欙紱鏈畨瑁呮闈㈢増鏃朵篃鍙敤婧愮爜妯″紡锛坄C:\Python314\python.exe mcp_server.py`锛夈€?
 
-**② Streamable HTTP（Cherry Studio / Cursor / Cline 等）**：先启动 MCP 服务，再在客户端添加：
-
-```bat
-"<安装目录>\resources\mcp\memo-mcp.exe" --http --port 8898
-```
-
-```
-地址: http://127.0.0.1:8898/mcp
-类型: Streamable HTTP（MCP）
-```
-
-> MCP 服务直接读取 `memo.db`，与桌面版 / 网页版共享同一份数据。
-
-## 数据迁移
-
-**旧网页版数据 → 桌面版**（首次安装桌面版时）：
+**鈶?Streamable HTTP锛圕herry Studio / Cursor / Cline 绛夛級**锛氬厛鍚姩 MCP 鏈嶅姟锛屽啀鍦ㄥ鎴风娣诲姞锛?
 
 ```bat
-# 用 SQLite 在线备份（含 WAL），不要直接复制文件
-C:\Python314\python.exe -c "import sqlite3,os; s=sqlite3.connect(r'项目目录\memo.db'); d=sqlite3.connect(os.path.join(os.environ['APPDATA'],'memo','data','memo.db')); s.backup(d); d.close(); s.close(); print('已迁移')"
+"<瀹夎鐩綍>\resources\mcp\memo-mcp.exe" --http --port 8898
 ```
 
-**换电脑 / 备份**：桌面版设置 → 导出 JSON → 新机器导入；或直接备份 `%APPDATA%\memo\data\memo.db`。
+```
+鍦板潃: http://127.0.0.1:8898/mcp
+绫诲瀷: Streamable HTTP锛圡CP锛?
+```
+
+> MCP 鏈嶅姟鐩存帴璇诲彇 `memo.db`锛屼笌妗岄潰鐗?/ 缃戦〉鐗堝叡浜悓涓€浠芥暟鎹€?
+
+## 鏁版嵁杩佺Щ
+
+**鏃х綉椤电増鏁版嵁 鈫?妗岄潰鐗?*锛堥娆″畨瑁呮闈㈢増鏃讹級锛?
+
+```bat
+# 鐢?SQLite 鍦ㄧ嚎澶囦唤锛堝惈 WAL锛夛紝涓嶈鐩存帴澶嶅埗鏂囦欢
+C:\Python314\python.exe -c "import sqlite3,os; s=sqlite3.connect(r'椤圭洰鐩綍\memo.db'); d=sqlite3.connect(os.path.join(os.environ['APPDATA'],'memo','data','memo.db')); s.backup(d); d.close(); s.close(); print('宸茶縼绉?)"
+```
+
+**鎹㈢數鑴?/ 澶囦唤**锛氭闈㈢増璁剧疆 鈫?瀵煎嚭 JSON 鈫?鏂版満鍣ㄥ鍏ワ紱鎴栫洿鎺ュ浠?`%APPDATA%\memo\data\memo.db`銆?
+
