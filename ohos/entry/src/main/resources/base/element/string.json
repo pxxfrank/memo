@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "MEMO 笔记入口模块"
+    },
+    {
+      "name": "ability_desc",
+      "value": "MEMO 笔记"
+    }
+  ]
+}

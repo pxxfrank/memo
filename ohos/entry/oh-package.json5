@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "1.3.0",
+  "description": "MEMO 笔记入口模块",
+  "main": "",
+  "author": "memo",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

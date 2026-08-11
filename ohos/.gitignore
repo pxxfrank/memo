@@ -1,0 +1,11 @@
+﻿# 构建产物
+/node_modules
+/oh_modules
+/.hvigor
+/.cxx
+**/build/
+/.idea
+/.deveco
+/local.properties
+*.hap
+*.app
