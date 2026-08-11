@@ -198,3 +198,12 @@ C:\Python314\python.exe -c "import sqlite3,os; s=sqlite3.connect(r'椤圭洰鐩�
 **鎹㈢數鑴?/ 澶囦唤**锛氭闈㈢増璁剧疆 鈫?瀵煎嚭 JSON 鈫?鏂版満鍣ㄥ鍏ワ紱鎴栫洿鎺ュ浠?`%APPDATA%\memo\data\memo.db`銆?
 
 
+
+
+
+## 移动端交付（v1.3.0）
+
+- **Android APK**：\mobile/release/MEMO-1.3.0.apk\（58.5MB，minSdk 24 / targetSdk 36，包名 com.memo.memo_mobile）
+  - 直接传到手机安装即可；首次启动在「设置 → 云同步」填写坚果云 WebDAV 地址 + 应用密码 + 同步口令，即与 Windows 桌面版双向同步（端到端加密）
+- **macOS（M 系列）**：移动端工程已含 macOS 平台（\mobile/macos/\，应用名 MEMO、网络权限已配），需在 Mac 上构建：\cd mobile && flutter run -d macos\（详见 MACOS-BUILD.md）
+- 手机端功能：笔记时间线 / #标签 / 每日回顾 / 统计 / WYSIWYG 富文本编辑 / 暗黑模式 / 坚果云同步

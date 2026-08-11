@@ -1,0 +1,62 @@
+Flutter assets will be downloaded from https://storage.flutter-io.cn. Make sure you trust this source!
+Flutter assets will be downloaded from https://storage.flutter-io.cn. Make sure you trust this source!
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:mergeReleaseNativeLibs'.
+> Could not resolve all files for configuration ':app:releaseRuntimeClasspath'.
+   > Could not resolve all dependencies for configuration ':app:releaseRuntimeClasspath'.
+      > Could not find io.flutter:armeabi_v7a_release:1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.
+        Searched in the following locations:
+          - https://maven.aliyun.com/repository/google/io/flutter/armeabi_v7a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/armeabi_v7a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://maven.aliyun.com/repository/public/io/flutter/armeabi_v7a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/armeabi_v7a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://dl.google.com/dl/android/maven2/io/flutter/armeabi_v7a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/armeabi_v7a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://repo.maven.apache.org/maven2/io/flutter/armeabi_v7a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/armeabi_v7a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+        Required by:
+            project ':app'
+   > Could not resolve all dependencies for configuration ':app:releaseRuntimeClasspath'.
+      > Could not find io.flutter:arm64_v8a_release:1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.
+        Searched in the following locations:
+          - https://maven.aliyun.com/repository/google/io/flutter/arm64_v8a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/arm64_v8a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://maven.aliyun.com/repository/public/io/flutter/arm64_v8a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/arm64_v8a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://dl.google.com/dl/android/maven2/io/flutter/arm64_v8a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/arm64_v8a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://repo.maven.apache.org/maven2/io/flutter/arm64_v8a_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/arm64_v8a_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+        Required by:
+            project ':app'
+   > Could not resolve all dependencies for configuration ':app:releaseRuntimeClasspath'.
+      > Could not find io.flutter:x86_64_release:1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.
+        Searched in the following locations:
+          - https://maven.aliyun.com/repository/google/io/flutter/x86_64_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/x86_64_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://maven.aliyun.com/repository/public/io/flutter/x86_64_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/x86_64_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://dl.google.com/dl/android/maven2/io/flutter/x86_64_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/x86_64_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://repo.maven.apache.org/maven2/io/flutter/x86_64_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/x86_64_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+        Required by:
+            project ':app'
+   > Could not resolve all dependencies for configuration ':app:releaseRuntimeClasspath'.
+      > Could not find io.flutter:flutter_embedding_release:1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.
+        Searched in the following locations:
+          - https://maven.aliyun.com/repository/google/io/flutter/flutter_embedding_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/flutter_embedding_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://maven.aliyun.com/repository/public/io/flutter/flutter_embedding_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/flutter_embedding_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://dl.google.com/dl/android/maven2/io/flutter/flutter_embedding_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/flutter_embedding_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+          - https://repo.maven.apache.org/maven2/io/flutter/flutter_embedding_release/1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1/flutter_embedding_release-1.0.0-5a2a6a42cce67f965cf540fcecf616faca624aa1.pom
+        Required by:
+            project ':app' > project :flutter_keyboard_visibility_temp_fork
+            project ':app' > project :jni
+            project ':app' > project :jni_flutter
+            project ':app' > project :quill_native_bridge_android
+            project ':app' > project :shared_preferences_android
+            project ':app' > project :sqflite_android
+            project ':app' > project :url_launcher_android
+
+* Try:
+> The project declares repositories, effectively ignoring the repositories you have declared in the settings.
+   To determine how project repositories are declared, configure your build to fail on project repositories.
+   For more information, please refer to https://docs.gradle.org/9.1.0/userguide/declaring_repositories.html#sub:fail_build_on_project_repositories in the Gradle documentation.
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (Powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 9m 28s
+Gradle task assembleRelease failed with exit code 1

@@ -20,7 +20,8 @@ Future<Database> _open() async {
   final dir = await getApplicationDocumentsDirectory();
   final path = p.join(dir.path, 'memo_mobile.db');
   final opts = OpenDatabaseOptions(version: 1, onCreate: _onCreate);
-  if (Platform.isWindows || Platform.isLinux) {
+  // Windows/Linux/macOS 桌面用 sqflite_common_ffi（sqflite 原生仅支持 Android/iOS）
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     return databaseFactoryFfi.openDatabase(path, options: opts);
   }
