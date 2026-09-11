@@ -1,209 +1,180 @@
-﻿# MEMO 路 flomo 骞虫浛锛堟湰鍦扮鏈夌増锛?
+# MEMO · flomo 平替（本地私有版）
 
-鍍忓彂寰崥涓€鏍疯绗旇锛屾暟鎹?100% 淇濆瓨鍦ㄦ湰鍦般€備繚鐣?flomo 鐨勬牳蹇冪壒鎬э細蹇€熻褰曘€佹爣绛句綋绯汇€佹椂闂寸嚎銆佹瘡鏃ュ洖椤俱€侀殢鏈烘极姝ャ€佸叏鏂囨悳绱€佺粺璁°€佸鍑恒€丄PI 鍐欏叆銆丮CP 渚?AI 璇诲彇锛?*涓嶅惈璇煶杈撳叆**銆?
+像发微博一样记笔记，**数据 100% 保存在本地**。保留 flomo 的核心体验：快速记录、标签体系、
+时间线、每日回顾、随机漫游、全文搜索、数据统计、导出 / 导入、外部 API 写入，
+并提供 **MCP 接口**让 AI 安全地读取你的笔记。**不含语音输入**。
 
-## 妗岄潰鐗堬紙鎺ㄨ崘锛?
+支持多端互通：Windows 桌面版 / 网页版(PWA) / Android / HarmonyOS 6 / macOS。
+各端本地各自存储（SQLite），通过坚果云交换**端到端加密**的变更日志实现双向同步。
 
-瀹夎 `desktop/release/MEMO-绗旇-Setup-1.1.0.exe`锛?
+---
 
-- 寮€濮嬭彍鍗?/ 妗岄潰鍥炬爣鎵撳紑**鐙珛绐楀彛**锛圲I 涓庣綉椤电増涓€鑷达級
-- **鏁版嵁鏈湴绉佹湁**锛歚%APPDATA%\memo\data\memo.db`锛圫QLite锛?
-- 鍐呯疆**鎵樼洏**锛堝彸涓嬭鍥炬爣锛夈€?*鍏ㄥ眬鐑敭**锛圕trl+Shift+M 浠绘剰鐣岄潰蹇€熻褰曪紝璁剧疆鍙敼锛夈€?*姣忔棩鍥為【閫氱煡**
-- 妗岄潰鐗堜娇鐢ㄧ鍙?**8900**锛涙棫缃戦〉鐗堬紙8899锛夊彲鍏卞瓨锛屼簩閫変竴浣跨敤鍗冲彲
-- 棣栨浣跨敤鍓嶆妸鏃ф暟鎹縼绉诲埌鏂版暟鎹洰褰曪紙瑙佷笅鏂?鏁版嵁杩佺Щ"锛?
+## 平台与交付物
 
-> 閲嶆柊鎵撳寘瀹夎绋嬪簭锛氬厛 `PyInstaller` 閲嶆墦鍚庣锛堣涓嬶級锛屽啀鍦?`desktop/` 涓嬫墽琛?`npm run dist`銆?
+| 平台 | 形态 | 位置 / 启动方式 |
+|---|---|---|
+| **Windows** | 桌面版安装包（Electron + Python 后端） | `desktop/release/MEMO-笔记-Setup-1.3.0.exe` |
+| Windows / 任意 | 网页版 / PWA（免安装） | 双击 `start.bat` → http://127.0.0.1:8899 |
+| **Android** | 手机 App（Flutter） | `mobile/release/MEMO-1.3.0.apk` |
+| **HarmonyOS 6** | 原生应用（ArkTS + ArkUI） | `ohos/`（用 DevEco Studio 构建，见 `OHOS-BUILD.md`） |
+| **macOS** | 桌面 App（Flutter） | `mobile/macos/`（需在 Mac 上构建，见 `MACOS-BUILD.md`） |
+| 任意 | 局域网网页（手机浏览器访问电脑） | 双击 `start_lan.bat` |
+| 任意 | MCP 接口（给 AI Agent 用） | `mcp_server.py` |
 
-## 缃戦〉鐗堬紙杞婚噺妯″紡锛?
+当前版本：**v1.3.0**
+
+---
+
+## 快速开始
+
+### ① Windows 桌面版（推荐）
+
+1. 双击 `desktop/release/MEMO-笔记-Setup-1.3.0.exe`，按向导安装
+2. 从开始菜单 / 桌面图标打开
+3. 托盘图标常驻，右键可用：快速记录 / 打开应用 / 立即回顾 / 退出
+4. 任意界面按 **`Ctrl+Shift+M`** 呼出快速记录小窗（回车保存，Esc 关闭）
+
+> 数据位置：`%APPDATA%\memo\data\memo.db`（本地 SQLite，不上传）。桌面版使用端口 **8900**。
+
+### ② 网页版（免安装，轻量）
 
 ```bat
-start.bat   # 鎴?python service.py --open锛堢鍙?8899锛屾祻瑙堝櫒鎵撳紑锛?
+start.bat          REM 或：python service.py --open
 ```
+浏览器打开 http://127.0.0.1:8899 ，数据存项目目录 `memo.db`。可「安装」为 PWA 应用。
 
-娴忚鍣?/ PWA 浣跨敤锛屾暟鎹湪椤圭洰鐩綍 `memo.db`銆傞€傚悎涓嶆兂瀹夎銆佷复鏃朵娇鐢ㄧ殑鍦烘櫙銆?
+### ③ 手机端
 
-## 鍔熻兘
+- **Android App**：安装 `mobile/release/MEMO-1.3.0.apk`，打开即用，设置里配云同步后与电脑互通
+- **不装 App**：双击 `start_lan.bat`，手机连**同一 WiFi**，浏览器访问 `http://<电脑IP>:8901`，
+  首次需输入访问令牌（令牌见 bat 窗口，或桌面版「设置 → 局域网访问」）
 
-| 鍔熻兘 | 璇存槑 |
+---
+
+## 功能与操作
+
+| 功能 | 用法 |
 |---|---|
-| 蹇€熻褰?| 涓昏緭鍏ユ Ctrl+Enter 淇濆瓨锛屾柊绗旇缃《 |
-| 鍏ㄥ眬鐑敭蹇€熻褰?| 浠绘剰鐣岄潰鎸?**Ctrl+Shift+M** 鍛煎嚭灏忕獥锛堟浛浠ｅ井淇¤緭鍏ワ級 |
-| 鏍囩浣撶郴 | `#鏍囩`銆佸绾?`#鐖?瀛恅锛岃嚜鍔ㄨВ鏋愩€佷晶鏍忕瓫閫?|
-| 鏃堕棿绾?| 鎸夊ぉ鍒嗙粍锛堜粖澶?鏄ㄥぉ/鏃ユ湡锛夛紝缃《绗旇浼樺厛 |
-| 鍏ㄦ枃鎼滅储 | 鍏抽敭璇?+ 鏍囩鍙犲姞绛涢€?|
-| 姣忔棩鍥為【 | 璁惧畾鏃堕棿闅忔満鍥為【鍘嗗彶绗旇锛堢郴缁熼€氱煡锛夛紝涔熷彲鎵嬪姩 馃幉 |
-| 鏁版嵁缁熻 | 杩炵画璁板綍澶╂暟銆佽繎涓€骞寸儹鍔涘浘銆佹湰鍛ㄦ柊澧炪€佸父鐢ㄦ爣绛?|
-| 瀵煎嚭/瀵煎叆 | JSON / Markdown / CSV锛屽彲杩佺Щ澶囦唤 |
-| 缂栬緫 / 缃《 / 鍒犻櫎 / 澶嶅埗 | 鍗＄墖鎮诞鎿嶄綔 |
-| PWA | 缃戦〉鐗堝彲瀹夎涓哄簲鐢?|
-| MCP | 渚?AI Agent 鎸夋爣绛?鏃ユ湡鑼冨洿璇诲彇涓庡啓鍏?|
-| 绉佹湁 | 鍏ㄩ儴鏁版嵁鏈湴瀛樺偍锛岄浂涓婁紶 |
+| 快速记录 | 顶部输入框 `Ctrl+Enter` 保存，或全局热键 `Ctrl+Shift+M` |
+| 标签体系 | 正文写 `#标签` 或 `#父/子`（多级标签自动解析，侧栏可筛选） |
+| 富文本 | 选中文字 → 工具栏 **B** 加粗 / **U** 下划线 / 列表 / 缩进（**所见即所得**） |
+| 全文搜索 | 顶部搜索框，可与标签叠加过滤 |
+| 时间线 | 按天分组，置顶笔记优先 |
+| 每日回顾 | 托盘「立即回顾」或设置定时；随机抽取历史笔记 |
+| 数据统计 | 累计笔记、连续记录天数、本周新增、常用标签、热力图 |
+| 暗黑模式 | 设置 → 外观 → 暗黑模式 |
+| 编辑 / 置顶 / 复制 / 删除 | 悬停卡片，右侧操作按钮 |
+| 导出 / 导入 | 设置 → 数据管理（JSON / Markdown / CSV） |
 
-## 浜戝悓姝ワ紙鍧氭灉浜?路 鍙樻洿鏃ュ織鏂规锛?
+---
 
-妗岄潰绔笌鎵嬫満绔悇鑷湰鍦扮紪杈戯紝缁忓潥鏋滀簯**浜ゆ崲鍙樻洿鏃ュ織**瀹炵幇鍙屽悜鍚屾锛堣瑙?`SYNC-DESIGN.md`锛夈€傛牳蹇冨師鍒欙細鍧氭灉浜戝彧浼犺緭灏忔枃鏈棩蹇楋紝**缁濅笉鐩存帴鍚屾 SQLite 鏂囦欢**锛堥伩鍏嶆崯鍧忥級銆?
+## 多设备云同步（坚果云 · 端到端加密）
 
-- 妗岄潰绔啓鎿嶄綔鑷姩杩藉姞鏃ュ織鍒?`{鍧氭灉浜戠洰褰晑/desktop.jsonl`锛屽苟瀹氭椂锛?5s锛夋媺鍙栧叾浠栬澶囨棩蹇楀悎骞?
-- 鍚堝苟瑙勫垯锛氭寜 `id + ts`锛屽悗鍐欒€呰儨锛坙ast-write-wins锛夛紱鍒犻櫎璧板纰戯紝鍙法璁惧鐢熸晥
-- 姣忕璁惧鍚嶅繀椤讳笉鍚岋細妗岄潰绔?`--device desktop`锛堥粯璁わ級锛屾墜鏈虹 `--device mobile`
-- 棣栨鍚敤鏃惰嚜鍔ㄦ妸瀛橀噺鏁版嵁 dump 涓哄叏閲忔棩蹇楋紝鏂拌澶囧彲浠庢棩蹇楀畬鏁撮噸寤?
-- **绔埌绔姞瀵嗭紙鍙€夛級**锛氳缃〉濉啓"鍚屾鍙ｄ护"鍚庯紝鏃ュ織浠?AES-256-GCM 瀵嗘枃瀛樺偍锛圥BKDF2 娲剧敓瀵嗛挜锛夛紝
-  鍧氭灉浜?璐﹀彿娉勯湶鑰呭彧鑳界湅鍒板瘑鏂囷紱鎵€鏈夎澶囬』浣跨敤鍚屼竴鍙ｄ护锛涙棫鏄庢枃鏃ュ織鑷姩鏃犳崯杞崲涓哄瘑鏂?
+各端本地编辑，经坚果云交换**变更日志**实现双向同步（详见 `SYNC-DESIGN.md`）。
+核心原则：坚果云只传输小文本日志，**绝不直接同步 SQLite 文件**。
 
-**浣跨敤锛堝綋鍓嶄负 API 閰嶇疆锛孶I 鍗冲皢涓婄嚎锛?*锛?
-1. 鍦ㄥ潥鏋滀簯鏈湴鍚屾鏂囦欢澶逛笅寤哄瓙鐩綍锛屽 `D:\Nutstore\memo-sync`
-2. 璁剧疆椤?鎺ュ彛閰嶇疆锛歚POST /api/config {"sync":{"dir":"D:\\Nutstore\\memo-sync"}}`
-3. 涔嬪悗鍐欐搷浣滆嚜鍔ㄨ褰曪紝姣?15 绉掕嚜鍔ㄥ悓姝ワ紱涔熷彲鎵嬪姩 `POST /api/sync/now`
-4. 鎵嬫満绔紙鏈潵 APP锛夌敤 `--device mobile` 鎸囧悜鍚屼竴鐩綍
+**配置步骤：**
 
-## 灞€鍩熺綉璁块棶锛堟墜鏈虹敤锛?
+1. 注册[坚果云](https://www.jianguoyun.com) → 账户信息 → 安全选项 → **添加应用密码**
+2. 各端「设置 → 云同步」填写：
+   - **WebDAV 地址**：`https://dav.jianguoyun.com/dav/memo-sync`（可自定义子目录）
+   - **用户名**：坚果云登录邮箱
+   - **应用密码**：上一步生成的密码
+   - **同步口令**：自定义密码，**所有设备保持一致**
+3. 保存后每 15 秒自动同步一次；也可「立即同步」
 
-鏁版嵁涓庢闈㈢増**鍚屼竴浠?*锛坄%APPDATA%\memo\data`锛夛紝鏃犻渶鍚屾銆?
+**加密**：填入同步口令后，日志以 AES-256-GCM 密文存储（PBKDF2 派生密钥），
+坚果云 / 账号泄露者只能看到密文。旧明文日志自动无损转密文。
 
-1. 鍙屽嚮 **`start_lan.bat`**锛堝悗绔嚜甯︼紝鏃犻渶 Python 鐜锛?
-2. 鎵嬫満杩?*鍚屼竴 WiFi**锛屾祻瑙堝櫒璁块棶 `http://<鐢佃剳IP>:8901`锛圛P 鐢?`ipconfig` 鏌ョ湅锛屾垨鐪?bat 绐楀彛鎻愮ず锛?
-3. 棣栨璁块棶杈撳叆**璁块棶浠ょ墝**锛堜护鐗屽湪 bat 绐楀彛杈撳嚭锛屾垨妗岄潰鐗?鈫?璁剧疆 鈫?灞€鍩熺綉璁块棶 鏌ョ湅/澶嶅埗锛?
+---
 
-瀹夊叏璇存槑锛?
-- 浠呯洃鍚眬鍩熺綉锛岄潪鏈満璁块棶涓€寰嬭姹備护鐗岋紙`Authorization: Bearer` / `X-Memo-Token` / `?token=`锛?
-- 鏈満璁块棶锛堟闈㈢増/缃戦〉鐗堬級鍏嶄护鐗岋紝浣撻獙涓嶅彉
-- 璁剧疆椤靛彲闅忔椂**閲嶇疆浠ょ墝**锛堟棫浠ょ墝绔嬪嵆澶辨晥锛?
-- 濡傞渶鍏綉璁块棶锛氬厛鐢?Tailscale / ZeroTier 缁勭綉锛屽啀璁块棶缁勭綉 IP锛?*鍒囧嬁鐩存帴绔彛鏄犲皠鏆撮湶鍏綉**
+## 数据与安全
 
-## 鏋舵瀯锛堢Щ鍔ㄧ棰勭暀锛?
+- 所有笔记默认**只存本机**；只有启用云同步后才会经坚果云交换**加密**日志
+- 数据文件：`%APPDATA%\memo\data\memo.db`（桌面版）/ 项目目录 `memo.db`（网页版）
+- 局域网访问需**令牌**鉴权（非本机一律校验），建议仅在可信 WiFi 使用
+- **备份**：设置 → 数据管理 → 导出；或直接拷贝 `memo.db`
 
-```
-鈹屸攢 鍓嶇锛圧eact锛孶I 灞傦級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
-鈹? 妗岄潰绐楀彛锛圗lectron锛壜?缃戦〉/PWA 路 鏈潵绉诲姩绔?   鈹?
-鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
-                鈹?REST API锛坙ocalhost:8900 / 8899锛?
-鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈻尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
-鈹?鍚庣锛圥ython 鏈嶅姟 / 鎵撳寘 exe锛?                鈹?
-鈹? 绗旇 API 路 鏍囩 路 缁熻 路 瀵煎嚭 路 flomo 鍏煎鍐欏叆 鈹?
-鈹? SQLite锛坢emo.db锛夋湰鍦板瓨鍌?                    鈹?
-鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
-```
+---
 
-绉诲姩绔紙瀹夊崜/iOS锛夋棤闇€閲嶅啓锛氬墠绔粍浠跺彲澶嶇敤锛圧eact Native / WebView锛夛紝鍚庣 REST API 鐩存帴閮ㄧ讲鍒版湇鍔″櫒鍗冲彲杩滅▼璁块棶锛屽瓨鍌ㄥ眰涓嶅彉銆侻CP 鎺ュ彛锛坄mcp_server.py`锛夊悓鏍峰彲閮ㄧ讲鍒版湇鍔″櫒渚涗簯绔?Agent 浣跨敤銆?
+## MCP：让 AI 读写你的笔记
 
-## 瀹夎涓庡惎鍔?
+`mcp_server.py` 提供 6 个工具：`list_tags` / `count_memos` / `list_memos` /
+`get_memo` / `add_memo` / `get_stats`。可在 Claude Desktop / Cherry Studio / Cursor 等客户端配置使用，
+AI 便能按标签、日期范围、关键词检索并写入你的笔记。
 
 ```bat
-pip install -r requirements.txt     # 瀹夎渚濊禆锛坧ystray keyboard pillow锛?
-start.bat                           # 鍚姩鏈嶅姟锛堝紑鍙?璋冭瘯锛屽甫绐楀彛锛?
+python mcp_server.py                    REM stdio 模式
+python mcp_server.py --http --port 8898 REM Streamable HTTP 模式
 ```
 
-鍚姩鍚庢墦寮€ http://127.0.0.1:8899/ 鍗冲彲浣跨敤銆?
+---
 
-**寮€鏈鸿嚜鍚紙鎺ㄨ崘锛?*锛氬弻鍑?`install_service.bat`锛屾敞鍐屼负鐧诲綍鑷惎鐨勫悗鍙版湇鍔★紙鏃犵獥鍙ｃ€佸父椹绘墭鐩橈紝鎻愪緵鐑敭涓庢瘡鏃ュ洖椤炬帹閫侊級銆傚嵏杞斤細`uninstall_service.bat`銆?
+## 开发
 
-> 娉ㄦ剰锛歚start.bat` / `install_service.bat` 榛樿浣跨敤 `C:\Python314\python.exe`锛岃嫢浣犵殑 Python 璺緞涓嶅悓锛岃淇敼 bat 鏂囦欢椤堕儴鐨勮矾寰勩€?
+### 目录结构
 
-## 甯哥敤鎿嶄綔
+```
+service.py          本地常驻服务：REST API + 静态托管 + 托盘/热键/回顾
+sync.py             云同步引擎（坚果云变更日志 + AES-256-GCM 加密）
+mcp_server.py       MCP AI 接口
+memo_common.py      共享基础模块（标签/时间/路径/数据库/统计，三端共用）
+flomo/              前端源码（React + Vite + Tailwind），改动后 npm run build 生成到 app/
+app/                前端构建产物（PWA）
+desktop/            Electron 桌面壳（含打包配置）
+mobile/             Flutter 手机端（Android / macOS）
+ohos/               HarmonyOS 6 原生工程（ArkTS）
+memo.db             网页版数据文件（自动创建）
+```
 
-- **璁颁竴鏉?*锛氶《閮ㄨ緭鍏ユ锛孍nter 淇濆瓨
-- **鏍囩**锛氭鏂囧啓 `#宸ヤ綔/鏃ユ姤` 鍗宠嚜鍔ㄥ綊绫伙紱鐐逛晶鏍忔爣绛剧瓫閫?
-- **鎼滅储**锛氶《閮ㄦ悳绱㈡锛屽彲涓庢爣绛惧彔鍔?
-- **鍥為【**锛氬彸涓?馃幉 鍥為【锛堥殢鏈烘娊鍙栧巻鍙茬瑪璁帮級锛涜缃噷鍙厤姣忔棩瀹氭椂鍥為【
-- **鏁版嵁**锛氳缃?鈫?瀵煎嚭/瀵煎叆/娓呯┖
+### 环境要求与构建
 
-## 澶栭儴鍐欏叆 API锛坒lomo 鍏煎锛?
+- **Python** 3.12+ ，依赖见 `requirements.txt`（cryptography / mcp / pystray / keyboard / pillow）
+- **Node.js** 18+（前端构建）
+- **Flutter** 3.x（手机端，可选）；**DevEco Studio**（鸿蒙，可选）
 
-浠讳綍鑴氭湰/宸ュ叿鍙悜鏈湴鏈嶅姟鍐欏叆绗旇锛?
+```bat
+REM 网页版 / 后端
+uv venv .venv --python 3.12
+uv pip install -r requirements.txt
+start.bat
+
+REM 前端
+cd flomo && npm install && npm run build    REM 产物需拷到 app/
+
+REM 打包桌面版
+python -m PyInstaller --onedir --name memo-backend --add-data "app;app" service.py
+cd desktop && npx electron-builder --win
+```
+
+### 测试
+
+```bat
+python _run_api_tests.py       REM 后端 API
+python _run_sync_tests.py      REM 同步引擎
+python _run_mcp_tests.py       REM MCP
+python _run_sync_e2e.py        REM 双端端到端同步
+powershell -File _run_desktop_tests.ps1   REM 桌面版打包冒烟
+```
+
+---
+
+## 外部写入 API（flomo 兼容）
 
 ```bash
 curl -X POST http://127.0.0.1:8899/v1/memo \
   -H "Content-Type: application/json" \
-  -d '{"content": "闅忔墜璁颁竴鏉?#娴嬭瘯"}'
+  -d '{"content": "随手记一条 #测试"}'
 ```
 
-閰嶅悎 PowerToys Run / 杈撳叆娉曞揩鎹锋寚浠?/ 鑷姩鍖栬剼鏈紝鍗冲彲瀹炵幇"鍏ㄥ眬浠绘剰鏃跺埢蹇€熻褰?锛堝井淇¤緭鍏ョ殑鏈湴鏇夸唬锛夈€?
+可配合 PowerToys Run / 快捷指令 / 自动化脚本，实现「全局任意时刻快速记录」。
 
-## 鐩綍缁撴瀯
+---
 
-```
-service.py          鏈湴甯搁┗鏈嶅姟锛圚TTP + API + 鐑敭 + 鎵樼洏 + 鍥為【锛?
-app/                鍓嶇搴旂敤锛圧eact 鏋勫缓浜х墿 + PWA锛?
-flomo/              鍓嶇婧愮爜锛圧eact + Vite + Tailwind锛屾敼鍔ㄥ悗 npm run build 閲嶆柊鐢熸垚鍒?app/锛?
-memo.db             鏁版嵁鏂囦欢锛圫QLite锛岃嚜鍔ㄥ垱寤猴級
-config.json         閰嶇疆锛堢儹閿€佸洖椤炬椂闂寸瓑锛屽簲鐢ㄥ唴鍙敼锛?
-start.bat           鎵嬪姩鍚姩
-install_service.bat 娉ㄥ唽寮€鏈鸿嚜鍚?
-uninstall_service.bat 绉婚櫎鑷惎
-```
+## 文档
 
-鍓嶇涓?Kimi 鐢熸垚鐨?React 椤甸潰锛屾暟鎹眰宸叉敼涓哄鎺ユ湰鏈嶅姟 API锛坄/api/memos`銆乣/api/stats`锛夛紝涓庡叏灞€鐑敭銆佹墭鐩樸€佹瘡鏃ュ洖椤惧叡鐢ㄥ悓涓€浠芥湰鍦版暟鎹€?
-
-## MCP 鎺ュ彛锛堜緵 AI Agent 璇诲彇/鍐欏叆锛?
-
-閫氳繃 [MCP](https://modelcontextprotocol.io) 鍗忚锛岃 Claude Desktop銆丆herry Studio銆丆line銆丆ursor 绛変换浣?AI 瀹㈡埛绔鍙栨湰鏈虹瑪璁般€?*璇诲彇蹇呴』鎸夎寖鍥磋繘琛?*锛氭敮鎸佹爣绛俱€佹棩鏈熴€佸叧閿瘝绛涢€?+ 鍒嗛〉 + 鎴柇锛岄伩鍏嶅叏鏂囧€掑簱銆?
-
-### 鎻愪緵 6 涓伐鍏?
-
-| 宸ュ叿 | 璇存槑 |
-|---|---|
-| `list_tags()` | 鎵€鏈夋爣绛惧強浣跨敤娆℃暟 |
-| `count_memos(tags?, start_date?, end_date?, query?)` | 鍏堟帰鏁伴噺鍐嶅喅瀹氭槸鍚﹁鍙?|
-| `list_memos(tags?, start_date?, end_date?, query?, limit?, offset?, preview_length?)` | 鑼冨洿绛涢€?+ 鍒嗛〉 + 鍙€夋埅鏂?|
-| `get_memo(memo_id)` | 鍗曟潯鍏ㄦ枃 |
-| `add_memo(content, created_at?)` | 鍐欏叆锛堟敮鎸?`#鏍囩`銆佸绾?`#鐖?瀛恅锛?|
-| `get_stats()` | 鎬绘暟 / 杩炵画澶╂暟 / 鏈懆鏂板 |
-
-- `tags`锛氭爣绛捐矾寰勬暟缁勶紝濡?`["宸ヤ綔"]` 浼氬尮閰?`宸ヤ綔/椤圭洰` 绛夊叏閮ㄥ瓙鏍囩
-- 鏃ユ湡锛歚YYYY-MM-DD`锛屽惈杈圭晫锛屾寜鏈湴鏃跺尯
-
-### 杩炴帴鏂瑰紡锛堜簩閫変竴锛?
-
-**瀹夎妗岄潰鐗堝悗锛孧CP 宸插唴缃?*锛歚<瀹夎鐩綍>\resources\mcp\memo-mcp.exe`锛岃嚜鍔ㄨ鍙栨闈㈢増鏁版嵁鐩綍锛坄%APPDATA%\memo\data\memo.db`锛夛紝鏃犻渶 Python 鐜銆?
-
-**鈶?stdio锛圕laude Desktop / 鏈湴 CLI锛?*锛氶厤缃惎鍔ㄥ懡浠ゅ嵆鍙紝鏃犻渶棰勫惎鍔ㄣ€?
-
-Claude Desktop 鐨?`claude_desktop_config.json`锛?
-
-```json
-{
-  "mcpServers": {
-    "memo": {
-      "command": "C:\\Program Files\\MEMO 绗旇\\resources\\mcp\\memo-mcp.exe",
-      "args": []
-    }
-  }
-}
-```
-
-> 瀹夎鐩綍榛樿 `C:\Program Files\MEMO 绗旇`锛岃嫢鑷畾涔夊畨瑁呯洰褰曡鎸夊疄闄呰矾寰勫～鍐欙紱鏈畨瑁呮闈㈢増鏃朵篃鍙敤婧愮爜妯″紡锛坄C:\Python314\python.exe mcp_server.py`锛夈€?
-
-**鈶?Streamable HTTP锛圕herry Studio / Cursor / Cline 绛夛級**锛氬厛鍚姩 MCP 鏈嶅姟锛屽啀鍦ㄥ鎴风娣诲姞锛?
-
-```bat
-"<瀹夎鐩綍>\resources\mcp\memo-mcp.exe" --http --port 8898
-```
-
-```
-鍦板潃: http://127.0.0.1:8898/mcp
-绫诲瀷: Streamable HTTP锛圡CP锛?
-```
-
-> MCP 鏈嶅姟鐩存帴璇诲彇 `memo.db`锛屼笌妗岄潰鐗?/ 缃戦〉鐗堝叡浜悓涓€浠芥暟鎹€?
-
-## 鏁版嵁杩佺Щ
-
-**鏃х綉椤电増鏁版嵁 鈫?妗岄潰鐗?*锛堥娆″畨瑁呮闈㈢増鏃讹級锛?
-
-```bat
-# 鐢?SQLite 鍦ㄧ嚎澶囦唤锛堝惈 WAL锛夛紝涓嶈鐩存帴澶嶅埗鏂囦欢
-C:\Python314\python.exe -c "import sqlite3,os; s=sqlite3.connect(r'椤圭洰鐩綍\memo.db'); d=sqlite3.connect(os.path.join(os.environ['APPDATA'],'memo','data','memo.db')); s.backup(d); d.close(); s.close(); print('宸茶縼绉?)"
-```
-
-**鎹㈢數鑴?/ 澶囦唤**锛氭闈㈢増璁剧疆 鈫?瀵煎嚭 JSON 鈫?鏂版満鍣ㄥ鍏ワ紱鎴栫洿鎺ュ浠?`%APPDATA%\memo\data\memo.db`銆?
-
-
-
-
-
-## 移动端交付（v1.3.0）
-
-- **Android APK**：\mobile/release/MEMO-1.3.0.apk\（58.5MB，minSdk 24 / targetSdk 36，包名 com.memo.memo_mobile）
-  - 直接传到手机安装即可；首次启动在「设置 → 云同步」填写坚果云 WebDAV 地址 + 应用密码 + 同步口令，即与 Windows 桌面版双向同步（端到端加密）
-- **macOS（M 系列）**：移动端工程已含 macOS 平台（\mobile/macos/\，应用名 MEMO、网络权限已配），需在 Mac 上构建：\cd mobile && flutter run -d macos\（详见 MACOS-BUILD.md）
-- 手机端功能：笔记时间线 / #标签 / 每日回顾 / 统计 / WYSIWYG 富文本编辑 / 暗黑模式 / 坚果云同步
+- `CLAUDE.md` — 项目协作手册（约定、端口、已知坑、版本规范）
+- `SYNC-DESIGN.md` — 云同步协议设计
+- `OHOS-BUILD.md` — 鸿蒙构建指南
+- `MACOS-BUILD.md` — macOS 构建指南
+- `MOBILE-PLAN.md` — 手机端规划
