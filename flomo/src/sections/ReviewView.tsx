@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { RefreshCcw, ArrowLeft } from 'lucide-react'
 import type { Memo } from '@/types/memo'
 import { request, toMemo, type MemoDTO } from '@/lib/api'
+import { dayLabel, fmtTime } from '@/lib/time'
 import { RichContent } from '@/components/RichContent'
 
 interface ReviewViewProps {
@@ -16,16 +17,6 @@ function shuffle<T>(a: T[]): T[] {
     ;[b[i], b[j]] = [b[j], b[i]]
   }
   return b
-}
-
-function dayLabel(ts: number): string {
-  const d = new Date(ts)
-  const today = new Date()
-  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime()
-  const diff = Math.round((startOf(today) - startOf(d)) / 86400_000)
-  if (diff === 0) return '今天'
-  if (diff === 1) return '昨天'
-  return `${d.getMonth() + 1}月${d.getDate()}日`
 }
 
 export function ReviewView({ onBack, onToast }: ReviewViewProps) {
@@ -94,7 +85,7 @@ export function ReviewView({ onBack, onToast }: ReviewViewProps) {
               <div className="mt-3 flex items-center gap-2 text-[11px] text-flomo-faint">
                 <span>📅 {dayLabel(m.createdAt)}</span>
                 <span>·</span>
-                <span>{new Date(m.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
+                <span>{fmtTime(m.createdAt)}</span>
                 {m.pinned && <span className="text-flomo-pin">📌 置顶</span>}
               </div>
             </div>

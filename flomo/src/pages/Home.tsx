@@ -1,27 +1,17 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMemos } from '@/hooks/useMemos'
-import { extractTags } from '@/types/memo'
+import { useToast } from '@/hooks/useToast'
+import { extractTags } from '@/lib/tags'
 import { Sidebar, type View } from '@/sections/Sidebar'
 import { Composer } from '@/sections/Composer'
 import { Timeline } from '@/sections/Timeline'
 import { ReviewView } from '@/sections/ReviewView'
 import { StatsView } from '@/sections/StatsView'
 import { SettingsView } from '@/sections/SettingsView'
+import { EditMemoDialog } from '@/components/EditMemoDialog'
+import { Toast } from '@/components/Toast'
 import { X } from 'lucide-react'
 import type { Memo } from '@/types/memo'
-import { FormatToolbar } from '@/components/FormatToolbar'
-import { RichEditor, type RichEditorHandle } from '@/components/RichEditor'
-
-function useToast() {
-  const [msg, setMsg] = useState<string | null>(null)
-  const timer = useRef<number | undefined>(undefined)
-  const show = useCallback((m: string) => {
-    setMsg(m)
-    window.clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setMsg(null), 2200)
-  }, [])
-  return { msg, show }
-}
 
 export default function Home() {
   const { memos, addMemo, togglePin, updateMemo, removeMemo, tags, streakDays, refresh } = useMemos()
@@ -30,8 +20,6 @@ export default function Home() {
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [pinnedOnly, setPinnedOnly] = useState(false)
   const [editing, setEditing] = useState<Memo | null>(null)
-  const [editText, setEditText] = useState('')
-  const editRef = useRef<RichEditorHandle>(null)
   const { msg, show } = useToast()
 
   const goTimeline = () => setView('timeline')
@@ -52,15 +40,13 @@ export default function Home() {
     goTimeline()
   }
 
-  const openEdit = (m: Memo) => {
-    setEditing(m)
-    setEditText(m.content)
-  }
-  const saveEdit = async () => {
+  const openEdit = (m: Memo) => setEditing(m)
+
+  const saveEdit = async (text: string) => {
     if (!editing) return
-    const text = editText.trim()
-    if (!text) return
-    await updateMemo(editing.id, text)
+    const t = text.trim()
+    if (!t) return
+    await updateMemo(editing.id, t)
     setEditing(null)
     show('已保存')
   }
@@ -142,51 +128,14 @@ export default function Home() {
 
       {/* 编辑弹窗 */}
       {editing && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-          onClick={() => setEditing(null)}
-        >
-          <div
-            className="w-[min(92vw,520px)] rounded-xl bg-flomo-card border border-flomo-line p-5 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-[15px] font-semibold mb-3">编辑笔记</h3>
-            <RichEditor
-              ref={editRef}
-              value={editText}
-              onChange={setEditText}
-              placeholder="修改内容……"
-              autoFocus
-              className="w-full rounded-lg border border-flomo-line bg-flomo-bg px-3.5 py-3 text-[14px] leading-relaxed outline-none focus:border-flomo-green/60 transition-colors min-h-[120px]"
-            />
-            <div className="mt-2 flex items-center gap-1">
-              <FormatToolbar onFormat={(kind) => editRef.current?.format(kind)} />
-            </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={() => setEditing(null)}
-                className="rounded-lg border border-flomo-line px-4 py-2 text-[13px] text-flomo-sub hover:text-flomo-ink transition-colors"
-              >
-                取消
-              </button>
-              <button
-                onClick={saveEdit}
-                disabled={!editText.trim()}
-                className="rounded-lg bg-flomo-green px-4 py-2 text-[13px] font-medium text-white hover:bg-flomo-greendark disabled:opacity-40 transition-colors"
-              >
-                保存
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditMemoDialog
+          initial={editing.content}
+          onCancel={() => setEditing(null)}
+          onSave={saveEdit}
+        />
       )}
 
-      {/* Toast */}
-      {msg && (
-        <div className="fixed left-1/2 bottom-8 z-[60] -translate-x-1/2 rounded-full bg-flomo-ink px-5 py-2.5 text-[13px] text-white shadow-lg dark:text-flomo-bg">
-          {msg}
-        </div>
-      )}
+      <Toast message={msg} />
     </div>
   )
 }

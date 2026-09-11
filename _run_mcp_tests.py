@@ -7,12 +7,13 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import os
 import time
 import urllib.request
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-PY = r"C:\Python314\python.exe"
+PY = os.environ.get("MEMO_PYTHON", str(BASE / ".venv" / "Scripts" / "python.exe"))
 DATA_DIR = Path(tempfile.mkdtemp(prefix="memo_mcp_test_"))
 API_PORT = 8912
 HTTP_PORT = 8913

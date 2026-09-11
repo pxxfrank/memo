@@ -12,50 +12,22 @@ MEMO 云同步引擎（坚果云 · 变更日志方案，见 SYNC-DESIGN.md）
 import base64
 import json
 import os
-import re
 import sqlite3
+import sys
 import threading
 import time
-import uuid as uuid_mod
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 
-TAG_RE = re.compile(r"#([^\s#，。！？!?,;；:：\u201c\u201d\u2018\u2019（）()【】\[\]<>《》]+)")
-_TAG_STRIP = re.compile(r"^[^\w\u4e00-\u9fff]+|[^\w\u4e00-\u9fff]+$")
+from memo_common import new_uuid, parse_tags, rebuild_tag_counts, set_memo_tags
+
 _ITERATIONS = 200_000
 
 
-def new_uuid():
-    return uuid_mod.uuid4().hex
-
-
-def parse_tags(content):
-    tags = set()
-    for m in TAG_RE.finditer(content):
-        raw = _TAG_STRIP.sub("", m.group(1))
-        parts = [p for p in raw.split("/") if p]
-        if not parts:
-            continue
-        path = []
-        for p in parts:
-            path.append(p)
-            tags.add("/".join(path))
-    return tags
-
-
-def rebuild_tag_counts(conn):
-    conn.execute("DELETE FROM tags")
-    conn.execute(
-        "INSERT INTO tags(name, count) SELECT name, COUNT(*) FROM memo_tags GROUP BY name")
-
-
-def set_memo_tags(conn, memo_id, tags):
-    conn.execute("DELETE FROM memo_tags WHERE memo_id=?", (memo_id,))
-    for t in sorted(tags):
-        conn.execute("INSERT OR IGNORE INTO memo_tags(memo_id, name) VALUES(?,?)", (memo_id, t))
-    rebuild_tag_counts(conn)
+def log(msg):
+    print(f"[sync] {msg}", file=sys.stderr, flush=True)
 
 
 # ---------------------------------------------------------------------------
@@ -102,16 +74,19 @@ class SyncEngine:
         self._state_path = os.path.join(data_dir, "sync-state.json")
         self.device = device
         self._crypto = None  # 缓存
+        self._crypto_key = None  # 缓存键（passphrase, salt）
 
     # ---------- 加密 ----------
     def _get_crypto(self):
         cfg = (self.get_config().get("sync", {}) or {})
         passphrase = cfg.get("passphrase") or ""
         salt = cfg.get("salt") or None
-        if self._crypto is not None:
-            if (self._crypto.enabled and passphrase) or (not self._crypto.enabled and not passphrase):
-                return self._crypto
+        # 缓存键含口令 + 盐指纹：改口令/换盐后即时重建密钥，无需重启
+        fingerprint = (passphrase, salt)
+        if self._crypto is not None and self._crypto_key == fingerprint:
+            return self._crypto
         self._crypto = SyncCrypto(passphrase, salt)
+        self._crypto_key = fingerprint
         return self._crypto
 
     # ---------- 路径 ----------
@@ -201,7 +176,7 @@ class SyncEngine:
     def ensure_full_dump(self):
         """首次启用同步时，把存量数据 dump 为 add 日志（密文/明文随配置）"""
         with self._lock:
-            path = self._log_path("desktop")
+            path = self._log_path(self.device)
             if os.path.exists(path) and os.path.getsize(path) > 0:
                 return
             conn = sqlite3.connect(self.db_path)
@@ -210,7 +185,7 @@ class SyncEngine:
                 "SELECT uuid, content, created_at, pinned FROM memos ORDER BY created_at").fetchall()
             conn.close()
             for r in rows:
-                self._append("desktop", {
+                self._append(self.device, {
                     "op": "add", "ts": (r["created_at"] or 1) - 1, "dev": self.device,
                     "id": r["uuid"], "content": r["content"],
                     "created_at": r["created_at"], "pinned": bool(r["pinned"]),
@@ -321,7 +296,10 @@ class SyncEngine:
         while True:
             try:
                 if self.get_config().get("sync", {}).get("dir"):
-                    self.pull_and_merge()
-            except Exception:
-                pass
+                    applied, failed = self.pull_and_merge()
+                    if applied or failed:
+                        log(f"pull_and_merge: applied={applied} failed={failed}")
+            except Exception as e:
+                # 同步长期失败需可感知（不再静默吞异常）
+                log(f"loop error: {e}")
             time.sleep(interval)

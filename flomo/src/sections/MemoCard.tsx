@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pin, PinOff, Copy, Check, Pencil, Trash2 } from 'lucide-react'
 import type { Memo } from '@/types/memo'
+import { fmtTime } from '@/lib/time'
 import { RichContent } from '@/components/RichContent'
 
 interface MemoCardProps {
@@ -13,8 +14,7 @@ interface MemoCardProps {
 
 export function MemoCard({ memo, onTogglePin, onRemove, onEdit, onTagClick }: MemoCardProps) {
   const [copied, setCopied] = useState(false)
-  const time = new Date(memo.createdAt)
-  const hhmm = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
+  const hhmm = fmtTime(memo.createdAt)
 
   const copy = async () => {
     try {

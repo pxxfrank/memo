@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { Memo } from '@/types/memo'
+import { dayKey, dayLabel } from '@/lib/time'
 import { MemoCard } from './MemoCard'
 
 interface TimelineProps {
@@ -10,23 +11,12 @@ interface TimelineProps {
   onTagClick: (tag: string) => void
 }
 
-function dayLabel(ts: number): string {
-  const d = new Date(ts)
-  const today = new Date()
-  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime()
-  const diff = Math.round((startOf(today) - startOf(d)) / 86400_000)
-  if (diff === 0) return '今天'
-  if (diff === 1) return '昨天'
-  if (d.getFullYear() === today.getFullYear()) return `${d.getMonth() + 1}月${d.getDate()}日`
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
-}
-
 export function Timeline({ memos, onTogglePin, onRemove, onEdit, onTagClick }: TimelineProps) {
   const groups = useMemo(() => {
     const sorted = [...memos].sort((a, b) => b.createdAt - a.createdAt)
     const map = new Map<string, Memo[]>()
     for (const m of sorted) {
-      const key = new Date(m.createdAt).toDateString()
+      const key = dayKey(m.createdAt)
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(m)
     }

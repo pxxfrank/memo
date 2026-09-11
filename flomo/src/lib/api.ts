@@ -20,10 +20,6 @@ export function getToken(): string {
   return localStorage.getItem(TOKEN_KEY) || ''
 }
 
-export function setToken(t: string): void {
-  localStorage.setItem(TOKEN_KEY, t)
-}
-
 /** 401 时通知 UI 弹出令牌输入（监听 window 'memo:unauthorized'） */
 export async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = {}

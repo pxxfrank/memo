@@ -7,12 +7,13 @@ import subprocess
 import sys
 import tempfile
 import time
+import os
 import urllib.request
 import urllib.parse
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-PY = r"C:\Python314\python.exe"
+PY = os.environ.get("MEMO_PYTHON", str(BASE / ".venv" / "Scripts" / "python.exe"))
 PORT = 8911
 DATA_DIR = Path(tempfile.mkdtemp(prefix="memo_test_"))
 BASE_URL = f"http://127.0.0.1:{PORT}"

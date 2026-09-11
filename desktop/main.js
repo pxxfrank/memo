@@ -19,7 +19,22 @@ let captureWin = null
 let quitting = false
 let lastReviewDate = ''
 
-const DATA_DIR = path.join(app.getPath('userData'), 'data')
+// 统一用户数据目录：固定为 %APPDATA%\memo
+// （不随 app name / productName 漂移；与 MCP 独立运行的回退目录、测试脚本约定保持一致）
+const USER_DATA = path.join(app.getPath('appData'), 'memo')
+app.setPath('userData', USER_DATA)
+const DATA_DIR = path.join(USER_DATA, 'data')
+
+// 兼容迁移：旧版本可能把数据写在 %APPDATA%\memo-desktop\data（当时 app name 不同）
+try {
+  const legacy = path.join(app.getPath('appData'), 'memo-desktop', 'data')
+  if (!fs.existsSync(path.join(DATA_DIR, 'memo.db')) && fs.existsSync(path.join(legacy, 'memo.db'))) {
+    fs.mkdirSync(DATA_DIR, { recursive: true })
+    fs.cpSync(legacy, DATA_DIR, { recursive: true })
+  }
+} catch {
+  /* 迁移失败不阻塞启动 */
+}
 
 // ---------------------------------------------------------------------------
 // 路径

@@ -7,11 +7,12 @@ import subprocess
 import sys
 import tempfile
 import time
+import os
 import urllib.request
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-PY = r"C:\Python314\python.exe"
+PY = os.environ.get("MEMO_PYTHON", str(BASE / ".venv" / "Scripts" / "python.exe"))
 ROOT = Path(tempfile.mkdtemp(prefix="memo_e2e_"))
 CLOUD = ROOT / "cloud"
 A_DIR, B_DIR = ROOT / "A", ROOT / "B"

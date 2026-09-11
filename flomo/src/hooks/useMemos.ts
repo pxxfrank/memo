@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Memo } from '@/types/memo'
-import { extractTags } from '@/types/memo'
+import { extractTags } from '@/lib/tags'
 import { request, toMemo, type MemoDTO } from '@/lib/api'
 
 export interface TagStat {
@@ -11,7 +11,6 @@ export interface TagStat {
 export function useMemos() {
   const [memos, setMemos] = useState<Memo[]>([])
   const [streakDays, setStreakDays] = useState(0)
-  const [ready, setReady] = useState(false)
 
   const refresh = useCallback(async () => {
     try {
@@ -29,7 +28,7 @@ export function useMemos() {
   }, [])
 
   useEffect(() => {
-    refresh().finally(() => setReady(true))
+    refresh()
   }, [refresh])
 
   const addMemo = useCallback(async (content: string) => {
@@ -95,5 +94,5 @@ export function useMemos() {
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh'))
   }, [memos])
 
-  return { memos, addMemo, togglePin, updateMemo, removeMemo, tags, streakDays, ready, refresh }
+  return { memos, addMemo, togglePin, updateMemo, removeMemo, tags, streakDays, refresh }
 }

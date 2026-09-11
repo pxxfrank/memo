@@ -21,7 +21,6 @@ import mimetypes
 import os
 import re
 import secrets
-import sqlite3
 import sys
 import threading
 import time
@@ -33,6 +32,21 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
 import sync as sync_mod
+from memo_common import (
+    compute_stats,
+    db_session,
+    fetch_memo,
+    init_schema,
+    insert_memo,
+    memo_row_to_dict,
+    new_uuid,
+    normalize_ts,
+    now_ms,
+    parse_tags,
+    rebuild_tag_counts,
+    resolve_data_dir,
+    set_memo_tags,
+)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -41,18 +55,10 @@ except Exception:
     pass
 
 
-def _is_frozen():
-    return bool(getattr(sys, "_MEIPASS", None))
-
-
-if _is_frozen():
-    # PyInstaller 打包运行：静态资源在解压目录，数据在用户数据目录
-    RUNTIME_DIR = Path(getattr(sys, "_MEIPASS"))
-    DATA_DIR = Path(os.environ.get("MEMO_DATA_DIR", Path.home() / ".memo"))
-else:
-    # 源码运行：优先 MEMO_DATA_DIR 环境变量（测试/多实例/桌面版数据目录），默认项目目录
-    RUNTIME_DIR = Path(__file__).resolve().parent
-    DATA_DIR = Path(os.environ.get("MEMO_DATA_DIR", str(RUNTIME_DIR)))
+# PyInstaller 打包：静态资源在解压目录，数据在用户数据目录
+# 源码运行：数据默认在项目目录（网页版），MEMO_DATA_DIR 可覆盖（桌面版/测试）
+RUNTIME_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+DATA_DIR = resolve_data_dir(RUNTIME_DIR)
 
 APP_DIR = RUNTIME_DIR / "app"
 DB_PATH = DATA_DIR / "memo.db"
@@ -116,93 +122,9 @@ def reset_token():
 # ---------------------------------------------------------------------------
 # 数据库
 # ---------------------------------------------------------------------------
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    return conn
-
-
 def init_db():
-    with get_db() as c:
-        c.execute("""CREATE TABLE IF NOT EXISTS memos(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            uuid TEXT,
-            content TEXT NOT NULL,
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER,
-            pinned INTEGER DEFAULT 0)""")
-        c.execute("""CREATE TABLE IF NOT EXISTS memo_tags(
-            memo_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            PRIMARY KEY(memo_id, name))""")
-        c.execute("""CREATE TABLE IF NOT EXISTS tags(
-            name TEXT PRIMARY KEY,
-            count INTEGER DEFAULT 0)""")
-        c.execute("CREATE INDEX IF NOT EXISTS idx_memos_created ON memos(created_at DESC)")
-        c.execute("CREATE INDEX IF NOT EXISTS idx_memo_tags_name ON memo_tags(name)")
-        # 存量库迁移：补 uuid 列并生成全局唯一 ID（多端同步依赖）
-        cols = [r[1] for r in c.execute("PRAGMA table_info(memos)")]
-        if "uuid" not in cols:
-            c.execute("ALTER TABLE memos ADD COLUMN uuid TEXT")
-        missing = c.execute("SELECT id FROM memos WHERE uuid IS NULL OR uuid=''").fetchall()
-        for (mid,) in missing:
-            c.execute("UPDATE memos SET uuid=? WHERE id=?", (sync_mod.new_uuid(), mid))
-        c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_memos_uuid ON memos(uuid)")
-
-
-# ---------------------------------------------------------------------------
-# 标签解析（flomo 风格：#标签、#父/子 多级）
-# ---------------------------------------------------------------------------
-TAG_RE = re.compile(r"#([^\s#，。！？!?,;；:：\u201c\u201d\u2018\u2019（）()【】\[\]<>《》]+)")
-_TAG_STRIP = re.compile(r"^[^\w\u4e00-\u9fff]+|[^\w\u4e00-\u9fff]+$")
-
-
-def parse_tags(content):
-    tags = set()
-    for m in TAG_RE.finditer(content):
-        raw = _TAG_STRIP.sub("", m.group(1))
-        parts = [p for p in raw.split("/") if p]
-        if not parts:
-            continue
-        path = []
-        for p in parts:                 # 父/子 → 存 '父' 与 '父/子'
-            path.append(p)
-            tags.add("/".join(path))
-    return tags
-
-
-def rebuild_tag_counts(conn):
-    conn.execute("DELETE FROM tags")
-    conn.execute(
-        "INSERT INTO tags(name, count) SELECT name, COUNT(*) FROM memo_tags GROUP BY name")
-
-
-def set_memo_tags(conn, memo_id, tags):
-    conn.execute("DELETE FROM memo_tags WHERE memo_id=?", (memo_id,))
-    for t in sorted(tags):
-        conn.execute("INSERT OR IGNORE INTO memo_tags(memo_id, name) VALUES(?,?)", (memo_id, t))
-    rebuild_tag_counts(conn)
-
-
-def memo_row_to_dict(row, tags=None):
-    return {
-        "id": row["id"],
-        "uuid": row["uuid"],
-        "content": row["content"],
-        "created_at": row["created_at"],
-        "updated_at": row["updated_at"],
-        "pinned": bool(row["pinned"]),
-        "tags": tags or [],
-    }
-
-
-def fetch_memo(conn, mid):
-    row = conn.execute("SELECT * FROM memos WHERE id=?", (mid,)).fetchone()
-    if not row:
-        return None
-    tags = [r[0] for r in conn.execute("SELECT name FROM memo_tags WHERE memo_id=?", (mid,))]
-    return memo_row_to_dict(row, tags)
+    with db_session(DB_PATH) as conn:
+        init_schema(conn)
 
 
 # 同步引擎（main() 初始化；写操作经此追加变更日志）
@@ -308,9 +230,13 @@ class Handler(SimpleHTTPRequestHandler):
             merged = dict(load_config())
             if body.get("reset_token"):
                 merged["token"] = reset_token()
+            # sync 子对象深合并：只发部分字段（如 dir）时不会冲掉已存的 passphrase/salt
+            sync_cfg = dict(merged.get("sync", {}) or {})
+            body_sync = body.get("sync")
+            if isinstance(body_sync, dict):
+                sync_cfg.update(body_sync)
             # 同步口令：设置时自动生成盐；提供空字符串则清除加密
             if "passphrase" in body:
-                sync_cfg = dict(merged.get("sync", {}) or {})
                 pp = (body["passphrase"] or "").strip()
                 if pp:
                     sync_cfg["passphrase"] = pp
@@ -319,9 +245,11 @@ class Handler(SimpleHTTPRequestHandler):
                 else:
                     sync_cfg.pop("passphrase", None)
                     sync_cfg.pop("salt", None)
+            top = {k: v for k, v in body.items()
+                   if k not in ("reset_token", "passphrase", "sync")}
+            merged.update(top)
+            if sync_cfg:
                 merged["sync"] = sync_cfg
-            body = {k: v for k, v in body.items() if k not in ("reset_token", "passphrase")}
-            merged.update(body)
             save_config(merged)
             resp = dict(merged)
             resp["token"] = merged.get("token", ensure_token())
@@ -351,7 +279,7 @@ class Handler(SimpleHTTPRequestHandler):
 
         # ---- 健康检查 ----
         if method == "GET" and path == "/api/health":
-            return self._json({"ok": True, "version": APP_VERSION, "time": int(time.time() * 1000)})
+            return self._json({"ok": True, "version": APP_VERSION, "time": now_ms()})
 
         if path.startswith("/api/"):
             return self._error("not found", 404)
@@ -374,23 +302,23 @@ class Handler(SimpleHTTPRequestHandler):
             params.append("%" + q + "%")
         wsql = ("WHERE " + " AND ".join(where)) if where else ""
 
-        conn = get_db()
-        total = conn.execute(
-            f"SELECT COUNT(DISTINCT m.id) AS c FROM memos m LEFT JOIN memo_tags t ON m.id=t.memo_id {wsql}",
-            params).fetchone()["c"]
-        rows = conn.execute(
-            f"""SELECT m.id, m.uuid, m.content, m.created_at, m.updated_at, m.pinned,
-                       GROUP_CONCAT(t.name) AS tag_list
-                FROM memos m LEFT JOIN memo_tags t ON m.id = t.memo_id
-                {wsql}
-                GROUP BY m.id
-                ORDER BY m.pinned DESC, m.created_at DESC
-                LIMIT ? OFFSET ?""",
-            params + [limit, offset]).fetchall()
-        items = []
-        for r in rows:
-            d = memo_row_to_dict(r, tags=[x for x in (r["tag_list"] or "").split(",") if x])
-            items.append(d)
+        with db_session(DB_PATH) as conn:
+            total = conn.execute(
+                f"SELECT COUNT(DISTINCT m.id) AS c FROM memos m LEFT JOIN memo_tags t ON m.id=t.memo_id {wsql}",
+                params).fetchone()["c"]
+            rows = conn.execute(
+                f"""SELECT m.id, m.uuid, m.content, m.created_at, m.updated_at, m.pinned,
+                           GROUP_CONCAT(t.name) AS tag_list
+                    FROM memos m LEFT JOIN memo_tags t ON m.id = t.memo_id
+                    {wsql}
+                    GROUP BY m.id
+                    ORDER BY m.pinned DESC, m.created_at DESC
+                    LIMIT ? OFFSET ?""",
+                params + [limit, offset]).fetchall()
+            items = []
+            for r in rows:
+                d = memo_row_to_dict(r, tags=[x for x in (r["tag_list"] or "").split(",") if x])
+                items.append(d)
         return self._json({"items": items, "total": total, "limit": limit, "offset": offset})
 
     def api_create_memo(self):
@@ -398,110 +326,80 @@ class Handler(SimpleHTTPRequestHandler):
         content = (body.get("content") or "").strip()
         if not content:
             return self._error("content 不能为空")
-        created_at = body.get("created_at") or int(time.time() * 1000)
-        created_at = normalize_ts(created_at)
-        conn = get_db()
-        cur = conn.execute(
-            "INSERT INTO memos(uuid, content, created_at) VALUES(?,?,?)",
-            (sync_mod.new_uuid(), content, created_at))
-        memo_id = cur.lastrowid
-        set_memo_tags(conn, memo_id, parse_tags(content))
-        conn.commit()
-        memo = fetch_memo(conn, memo_id)
+        created_at = normalize_ts(body.get("created_at") or now_ms())
+        with db_session(DB_PATH) as conn:
+            memo_id = insert_memo(conn, content, created_at)
+            memo = fetch_memo(conn, memo_id)
         if SYNC:
             SYNC.log_op("add", memo)
         return self._json(memo, 201)
 
     def api_update_memo(self, mid):
         body = self._read_json()
-        conn = get_db()
-        if not conn.execute("SELECT id FROM memos WHERE id=?", (mid,)).fetchone():
-            return self._error("memo 不存在", 404)
-        if "pinned" in body:
-            conn.execute("UPDATE memos SET pinned=? WHERE id=?",
-                         (1 if body["pinned"] else 0, mid))
-            conn.commit()
-            memo = fetch_memo(conn, mid)
-            if SYNC:
-                SYNC.log_op("pin", memo)
-            return self._json(memo)
-        content = (body.get("content") or "").strip()
-        if not content:
-            return self._error("content 不能为空")
-        conn.execute("UPDATE memos SET content=?, updated_at=? WHERE id=?",
-                     (content, int(time.time() * 1000), mid))
-        set_memo_tags(conn, mid, parse_tags(content))
-        conn.commit()
-        memo = fetch_memo(conn, mid)
+        with db_session(DB_PATH) as conn:
+            if not conn.execute("SELECT id FROM memos WHERE id=?", (mid,)).fetchone():
+                return self._error("memo 不存在", 404)
+            if "pinned" in body:
+                conn.execute("UPDATE memos SET pinned=? WHERE id=?",
+                             (1 if body["pinned"] else 0, mid))
+                memo = fetch_memo(conn, mid)
+                action = "pin"
+            else:
+                content = (body.get("content") or "").strip()
+                if not content:
+                    return self._error("content 不能为空")
+                conn.execute("UPDATE memos SET content=?, updated_at=? WHERE id=?",
+                             (content, now_ms(), mid))
+                set_memo_tags(conn, mid, parse_tags(content))
+                memo = fetch_memo(conn, mid)
+                action = "update"
         if SYNC:
-            SYNC.log_op("update", memo)
+            SYNC.log_op(action, memo)
         return self._json(memo)
 
     def api_clear_memos(self):
-        conn = get_db()
-        uuids = [r[0] for r in conn.execute("SELECT uuid FROM memos")]
-        conn.execute("DELETE FROM memos")
-        conn.execute("DELETE FROM memo_tags")
-        rebuild_tag_counts(conn)
-        conn.commit()
+        with db_session(DB_PATH) as conn:
+            uuids = [r[0] for r in conn.execute("SELECT uuid FROM memos")]
+            conn.execute("DELETE FROM memos")
+            conn.execute("DELETE FROM memo_tags")
+            rebuild_tag_counts(conn)
         if SYNC:
             for u in uuids:
                 SYNC.log_op("delete", id=u)
         return self._json({"ok": True})
 
     def api_delete_memo(self, mid):
-        conn = get_db()
-        row = conn.execute("SELECT * FROM memos WHERE id=?", (mid,)).fetchone()
-        if not row:
-            return self._error("memo 不存在", 404)
-        conn.execute("DELETE FROM memos WHERE id=?", (mid,))
-        conn.execute("DELETE FROM memo_tags WHERE memo_id=?", (mid,))
-        rebuild_tag_counts(conn)
-        conn.commit()
+        with db_session(DB_PATH) as conn:
+            row = conn.execute("SELECT * FROM memos WHERE id=?", (mid,)).fetchone()
+            if not row:
+                return self._error("memo 不存在", 404)
+            conn.execute("DELETE FROM memos WHERE id=?", (mid,))
+            conn.execute("DELETE FROM memo_tags WHERE memo_id=?", (mid,))
+            rebuild_tag_counts(conn)
+            uuid = row["uuid"]
         if SYNC:
-            SYNC.log_op("delete", id=row["uuid"])
+            SYNC.log_op("delete", id=uuid)
         return self._json({"ok": True})
 
     def api_tags(self):
-        conn = get_db()
-        rows = conn.execute(
-            "SELECT name, count FROM tags WHERE count > 0 ORDER BY count DESC, name").fetchall()
+        with db_session(DB_PATH) as conn:
+            rows = conn.execute(
+                "SELECT name, count FROM tags WHERE count > 0 ORDER BY count DESC, name").fetchall()
         return self._json({"tags": [{"name": r["name"], "count": r["count"]} for r in rows]})
 
     def api_stats(self):
         qs = self._query()
         days = min(int(qs.get("days", ["365"])[0]), 3650)
-        conn = get_db()
-        rows = conn.execute(
-            "SELECT date(created_at/1000, 'unixepoch', 'localtime') AS d, COUNT(*) AS c "
-            "FROM memos GROUP BY d").fetchall()
-        by_day = {r["d"]: r["c"] for r in rows}
-        today = datetime.now().date()
-        series = []
-        for i in range(days - 1, -1, -1):
-            d = today - timedelta(days=i)
-            series.append({"date": d.isoformat(), "count": by_day.get(d.isoformat(), 0)})
-        # 连续记录天数（允许今天未记，从昨天起算）
-        streak = 0
-        d = today if by_day.get(today.isoformat()) else today - timedelta(days=1)
-        while by_day.get(d.isoformat(), 0) > 0:
-            streak += 1
-            d -= timedelta(days=1)
-        monday = today - timedelta(days=today.weekday())
-        week = 0
-        for i in range(7):
-            week += by_day.get((monday + timedelta(days=i)).isoformat(), 0)
-        total = conn.execute("SELECT COUNT(*) AS c FROM memos").fetchone()["c"]
-        return self._json({
-            "days": series, "streak": streak, "total": total,
-            "thisWeek": week, "today": today.isoformat()})
+        with db_session(DB_PATH) as conn:
+            stats = compute_stats(conn, days)
+        return self._json(stats)
 
     def api_export(self):
         qs = self._query()
         fmt = qs.get("format", ["json"])[0]
-        conn = get_db()
-        rows = conn.execute(
-            "SELECT * FROM memos ORDER BY created_at ASC").fetchall()
+        with db_session(DB_PATH) as conn:
+            rows = conn.execute(
+                "SELECT * FROM memos ORDER BY created_at ASC").fetchall()
         memos = [memo_row_to_dict(r) for r in rows]
         ts = datetime.now().strftime("%Y%m%d")
         if fmt == "md":
@@ -544,22 +442,19 @@ class Handler(SimpleHTTPRequestHandler):
             data = data.get("memos", [])
         if not isinstance(data, list):
             return self._error("导入数据格式不正确")
-        conn = get_db()
-        n = 0
-        for item in data:
-            content = (item.get("content") or "").strip()
-            if not content:
-                continue
-            created_at = normalize_ts(item.get("created_at") or int(time.time() * 1000))
-            cur = conn.execute("INSERT INTO memos(uuid, content, created_at) VALUES(?,?,?)",
-                               (sync_mod.new_uuid(), content, created_at))
-            set_memo_tags(conn, cur.lastrowid, parse_tags(content))
-            memo = fetch_memo(conn, cur.lastrowid)
+        created = []
+        with db_session(DB_PATH) as conn:
+            for item in data:
+                content = (item.get("content") or "").strip()
+                if not content:
+                    continue
+                created_at = normalize_ts(item.get("created_at") or now_ms())
+                memo_id = insert_memo(conn, content, created_at)
+                created.append(fetch_memo(conn, memo_id))
+        for memo in created:
             if SYNC:
                 SYNC.log_op("add", memo)
-            n += 1
-        conn.commit()
-        return self._json({"ok": True, "imported": n})
+        return self._json({"ok": True, "imported": len(created)})
 
     def api_flomo(self):
         """flomo 兼容：POST /v1/memo  body: {"content": "..."} 或表单 content=..."""
@@ -574,13 +469,10 @@ class Handler(SimpleHTTPRequestHandler):
         content = (body.get("content") or "").strip()
         if not content:
             return self._error("content 不能为空")
-        created_at = body.get("created_at") or int(time.time() * 1000)
-        conn = get_db()
-        cur = conn.execute("INSERT INTO memos(uuid, content, created_at) VALUES(?,?,?)",
-                           (sync_mod.new_uuid(), content, normalize_ts(created_at)))
-        set_memo_tags(conn, cur.lastrowid, parse_tags(content))
-        conn.commit()
-        memo = fetch_memo(conn, cur.lastrowid)
+        created_at = normalize_ts(body.get("created_at") or now_ms())
+        with db_session(DB_PATH) as conn:
+            memo_id = insert_memo(conn, content, created_at)
+            memo = fetch_memo(conn, memo_id)
         if SYNC:
             SYNC.log_op("add", memo)
         notify("MEMO 已记录", memo["content"][:60])
@@ -610,24 +502,6 @@ class Handler(SimpleHTTPRequestHandler):
         if r is not None:
             return
         self._error("not found", 404)
-
-
-def normalize_ts(v):
-    """兼容毫秒时间戳 / ISO 字符串 / 'YYYY-MM-DD HH:MM'"""
-    if isinstance(v, (int, float)):
-        return int(v)
-    s = str(v).strip()
-    try:
-        return int(s)
-    except ValueError:
-        pass
-    for fmt in ("%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S",
-                "%Y-%m-%d %H:%M", "%Y-%m-%d"):
-        try:
-            return int(datetime.strptime(s, fmt).timestamp() * 1000)
-        except ValueError:
-            continue
-    return int(time.time() * 1000)
 
 
 # ---------------------------------------------------------------------------
@@ -757,13 +631,13 @@ def review_loop():
 def do_review():
     cfg = load_config()
     n = int(cfg.get("review_count", 3))
-    conn = get_db()
     today0 = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    rows = conn.execute(
-        "SELECT * FROM memos WHERE created_at < ? ORDER BY RANDOM() LIMIT ?",
-        (int(today0.timestamp() * 1000), n)).fetchall()
-    if not rows:
-        rows = conn.execute("SELECT * FROM memos ORDER BY RANDOM() LIMIT ?", (n,)).fetchall()
+    with db_session(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT * FROM memos WHERE created_at < ? ORDER BY RANDOM() LIMIT ?",
+            (int(today0.timestamp() * 1000), n)).fetchall()
+        if not rows:
+            rows = conn.execute("SELECT * FROM memos ORDER BY RANDOM() LIMIT ?", (n,)).fetchall()
     if not rows:
         notify("每日回顾", "还没有笔记，先记一条吧 ✍️")
         return

@@ -161,3 +161,29 @@ grep 'APP_VERSION' service.py
 - 鐩墠鏃犻壌鏉冿紙浠呯洃鍚?127.0.0.1锛夛紝鍏綉閮ㄧ讲鍓嶅繀椤诲姞鐧诲綍/Token
 
 
+
+
+## 后端重构记录（2026-09，v1.3.0）
+
+### 公共模块 memo_common.py（唯一来源，勿再复制）
+标签解析 parse_tags / rebuild_tag_counts / set_memo_tags；时间 now_ms / normalize_ts；
+路径 is_frozen / resolve_data_dir；数据库 connect / db_session / init_schema / insert_memo /
+fetch_memo / memo_row_to_dict / compute_stats。service.py、sync.py、mcp_server.py 全部改为导入此模块。
+
+### 数据目录统一约定（重要）
+桌面版固定 userData = %APPDATA%\\memo（main.js 显式 app.setPath，不再随 app name 漂移），
+数据在 %APPDATA%\\memo\\data\\memo.db；MCP 独立运行、_run_desktop_tests.ps1、start_lan.bat 均回退同一路径。
+首次启动会自动从旧的 %APPDATA%\\memo-desktop\\data 迁移数据。
+
+### 测试环境
+requirements.txt 已补全（cryptography / mcp 为必需依赖）；统一用项目 .venv：
+  uv venv .venv --python 3.12 ; uv pip install -r requirements.txt
+测试脚本用环境变量 MEMO_PYTHON 或默认 .venv\\Scripts\\python.exe 定位解释器（不再硬编码 C:\\Python3xx）。
+
+### 统计字段统一
+compute_stats 返回 thisWeek / streak / total / today（REST 与 MCP 共用，前端字段名不变）。
+
+### 前端重构
+标签规则唯一来源 lib/tags.ts（与后端 parse_tags 对齐）；时间格式化 lib/time.ts；
+新增 hooks/useToast.ts、components/Toast.tsx、components/EditMemoDialog.tsx；删除死代码
+（rich.ts applyFormat、App.css、api.ts setToken、useMemos ready）。
